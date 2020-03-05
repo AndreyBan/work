@@ -1,5 +1,10 @@
+
 document.addEventListener('DOMContentLoaded', function () {
 
+// if (!modeEdit()) {
+	new ClipboardJS('.copy-icon'); //Покдлючаем копирование по кнопке
+	new ClipboardJS('.results__value'); //Покдлючаем копирование по полю с паролем
+// }
 	let url = 'query.php',
 		itemChange = document.querySelectorAll('.items__elem'),
 		subitemChange = document.querySelectorAll('.subitem li'),
@@ -14,10 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		return strGET === 'admin';
 	}
 
-	if (!modeEdit()) {
-		new ClipboardJS('.copy-icon'); //Покдлючаем копирование по кнопке
-		new ClipboardJS('.results__value'); //Покдлючаем копирование по полю с паролем
-	}
 
 	/********Делаем открытие подменю************/
 
@@ -211,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (!modeEdit()) {
 			let str = '<div class="results__field" data-id="' + elId + '">\n' +
 				'<span class="name">' + fieldName + ':' + '</span>\n' +
-				'    <input type="text" class="results__value" data-clipboard-action="copy" data-clipboard-target="#field-' + elId + '"\n' +
+				'    <input type="text" class="results__value" data-clipboard-action="copy" id="field-' + elId +'" data-clipboard-target="#field-' + elId + '"\n' +
 				'    data-id="' + elId + '" value="' + fieldVal + '"/>\n' +
 				'    <span class="copy-icon" data-clipboard-action="copy" data-clipboard-target="#field-' + elId + '">\n' +
 				'        <i class="ico-copy">\n' +
@@ -226,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		} else {
 			let str = '<div class="results__field" data-id="' + elId + '">\n' +
 				'<input type="text" class="name" data-name="FIELD" data-id="' + elId + '" value="' + fieldName + '"/>\n' +
-				'    <input type="text" class="results__value" data-clipboard-action="copy" data-clipboard-target="#field-' + elId + '"\n' +
+				'    <input type="text" class="results__value"\n' +
 				'    data-id="' + elId + '" data-name="VALUE" value="' + fieldVal + '"/>\n' +
 				'</div>',
 				block = document.querySelector('.block__value[data-name="' + type +'"]');
