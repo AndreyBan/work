@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		return strGET === 'admin';
 	}
 
-
 	/********Делаем открытие подменю************/
 
 	itemChange.forEach(function (item) {
