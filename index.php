@@ -6,7 +6,6 @@ $arrItems = call_db(HOST, USER, PASS, DB);
 $arrSort = getSortArr($arrItems);
 $path = '';
 ?>
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
