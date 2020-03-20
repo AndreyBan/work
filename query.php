@@ -9,7 +9,14 @@ if ($mysqli->connect_error) {
 
 if (!empty($_POST['ID']) && empty($_POST['JSON'])){
 	$id = $_POST['ID'];
-	$sql2 = "SELECT
+	$sql = "SELECT
+	 `sites`.NAME,
+	 `sites`.ID,
+	 `sites`.LINK
+ FROM `sites` WHERE `sites`.ID = $id";
+	$result = $mysqli->query($sql);
+	$arrRes["ONE"] = $result->fetch_all(MYSQLI_ASSOC);
+	$sql = "SELECT
 	 `sites`.NAME,
 	 `sites`.ID,
 	 `sites`.LINK,
@@ -20,8 +27,8 @@ if (!empty($_POST['ID']) && empty($_POST['JSON'])){
 	 `type`.TYPE_NAME
  FROM `sites` INNER JOIN `data` ON `sites`.ID = `data`.ID
  INNER JOIN `type` ON `data`.id_type = `type`.id_type WHERE `sites`.ID = $id";
-	$result = $mysqli->query($sql2);
-	$arrRes = $result->fetch_all(MYSQLI_ASSOC);
+	$result = $mysqli->query($sql);
+	$arrRes["TWO"] = $result->fetch_all(MYSQLI_ASSOC);
 	$arrRes = json_encode($arrRes, true);
 	echo $arrRes;
 }
@@ -36,11 +43,16 @@ else if(empty($_POST['JSON'])){
 if (!empty($_POST['JSON'])){
 
 	$json = json_decode($_POST['JSON']);
-	$action = $json->action;
-	$inputName = $json->name;
-	$inputId = $json->id_input;
-	$inputValue = $json->value;
-	$inputType = $json->type;
+	$action = '';
+	$inputName = '';
+	$inputId = '';
+	$inputValue = '';
+	$inputType = '';
+	if(!empty($json->action)) $action = $json->action;
+	if(!empty($json->name)) $inputName = $json->name;
+	if(!empty($json->id_input)) $inputId = $json->id_input;
+	if(!empty($json->value)) $inputValue = $json->value;
+	if(!empty($json->type)) $inputType = $json->type;
 
 	if($action === 'save') {
 		if ($inputName !== 'TYPE') {
@@ -54,6 +66,33 @@ if (!empty($_POST['JSON'])){
 	}
 	if($action === 'remove') {
 		$sqlUpdate = "DELETE FROM `data` WHERE `data`.id_data = $inputId";
+		$mysqli->query($sqlUpdate);
+		$sql = "SELECT `data`.id_type FROM `data`";
+		$resData = $mysqli->query($sql);
+		$arResData = $resData->fetch_all(MYSQLI_ASSOC);
+		$sql = "SELECT `type`.id_type FROM `type`";
+		$resType = $mysqli->query($sql);
+		$arResType = $resType->fetch_all(MYSQLI_ASSOC);
+		$arValueType = [];
+		$arValueData = [];
+
+		foreach ($arResType as $arItem){
+			$arValueType[] = $arItem["id_type"];
+		}
+		foreach ($arResData as $arItem){
+			$arValueData[] = $arItem["id_type"];
+		}
+		$arRes = array_diff($arValueType, $arValueData);
+		$str = '`type`.id_type IN';
+		$counter = 0;
+		$total = count($arRes);
+		foreach ($arRes as $i => $item){
+			$counter++;
+			if($counter == 1) $str = $str ." (" . $item .",";
+			elseif ($counter !== $total) $str = $str . $item .",";
+			if($counter == $total) $str = $str . $item .")";
+		}
+		$sqlUpdate = "DELETE FROM `type` WHERE $str";
 	}
 	if($action === 'createTypeRow') {
 		$inputSite = $json->site;

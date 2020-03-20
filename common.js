@@ -201,18 +201,16 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		div.className = 'block__value';
-		// div.id = 'result-' + type;
 		div.setAttribute('data-name', type);
 		div.setAttribute('data-id', id);
 		resultBlock.appendChild(div);
 
 		h3.className = 'subtitle';
 		h3.innerHTML = type;
-		// document.getElementById('result-' + type).appendChild(h3);
-		document.querySelector('.block__value[data-name="' + type + '"]').appendChild(h3);
+		document.querySelector('.block__value[data-name="' + type + '"][data-id="' + id + '"]').appendChild(h3);
 	}
 
-	function createField(elId, type, fieldName, fieldVal) {
+	function createField(elId, type, fieldName, fieldVal, typeId) {
 		if (!modeEdit()) {
 			let str = '<div class="results__field" data-id="' + elId + '">\n' +
 				'<span class="name">' + fieldName + ':' + '</span>\n' +
@@ -226,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				'        </i>\n' +
 				'        </span>\n' +
 				'</div>',
-				block = document.querySelector('.block__value[data-name="' + type + '"]');
+				block = document.querySelector('.block__value[data-name="' + type + '"][data-id="' + typeId + '"]');
 			block.insertAdjacentHTML("beforeend", str);
 		} else {
 			let str = '<div class="results__field" data-id="' + elId + '">\n' +
@@ -234,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				'    <input type="text" class="results__value" data-clipboard-action="copy" data-clipboard-target="#field-' + elId + '"\n' +
 				'    data-id="' + elId + '" data-name="VALUE" value="' + fieldVal + '"/>\n' +
 				'</div>',
-				block = document.querySelector('.block__value[data-name="' + type + '"]');
+				block = document.querySelector('.block__value[data-name="' + type + '"][data-id="' + typeId + '"]');
 			block.insertAdjacentHTML("beforeend", str);
 		}
 	}
@@ -268,6 +266,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			rbBlockValue.forEach(function (item, index) {
 				if (rbBlockValue.length === (index + 1)) item.insertAdjacentHTML("beforeend", str);
 			});
+			if(document.querySelector('.results__block > .add-block')){
+				document.querySelector('.results__block > .add-block').remove();
+			}
 		} else {
 			document.querySelector('.results__block').insertAdjacentHTML("beforeend", str);
 		}
@@ -296,16 +297,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	/************Вывод результатов************/
 	function outputResults(elem) {
-		valueTitle.innerText = elem[0].NAME;
-		valueTitle.setAttribute('href', elem[0].LINK);
-		valueTitle.setAttribute('data-id', elem[0].ID);
-		for (let k of elem) {
-			let blockVal = document.querySelector('.block__value[data-name="' + k.TYPE_NAME + '"]');
+		valueTitle.innerText = elem["ONE"][0].NAME;
+		valueTitle.setAttribute('href', elem["ONE"][0].LINK);
+		valueTitle.setAttribute('data-id', elem["ONE"][0].ID);
+		for (let k of elem["TWO"]) {
+			let blockVal = document.querySelector('.block__value[data-name="' + k.TYPE_NAME + '"][data-id="' + k.id_type + '"]');
 			if (!blockVal) {
 				createValueBlock(k.TYPE_NAME, k.id_type);
-				createField(k.id_data, k.TYPE_NAME, k.FIELD, k.VALUE);
+				createField(k.id_data, k.TYPE_NAME, k.FIELD, k.VALUE, k.id_type);
 			} else {
-				createField(k.id_data, k.TYPE_NAME, k.FIELD, k.VALUE);
+				createField(k.id_data, k.TYPE_NAME, k.FIELD, k.VALUE, k.id_type);
 			}
 		}
 	}
@@ -324,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		})
 			.then(response => response.json())
 			.then(elem => {
-				if (elem.length) {
+				if (elem['ONE'].length) {
 					outputResults(elem);
 				} else valueTitle.innerText = 'Нет данных';
 
@@ -422,6 +423,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (id !== '') sendData("ID=" + id);
 			}
 		})
+
 			.catch(error => alert(error));
 	}
 
