@@ -261,16 +261,18 @@ document.addEventListener('DOMContentLoaded', function () {
 	function addBlockValue() {
 		let str = `<div class="add-block">Добавить блок</div>`;
 
+
 		if (document.querySelector('.results__block .block__value')) {
-			let rbBlockValue = document.querySelectorAll('.results__block .block__value');
-			rbBlockValue.forEach(function (item, index) {
-				if (rbBlockValue.length === (index + 1)) item.insertAdjacentHTML("beforeend", str);
-			});
+			let rbBlockValue = document.querySelectorAll('.block__value');
 			if(document.querySelector('.results__block > .add-block')){
 				document.querySelector('.results__block > .add-block').remove();
 			}
+			rbBlockValue.forEach(function (item, index) {
+				if (rbBlockValue.length === (index + 1)) item.insertAdjacentHTML("afterEnd", str);
+			});
+
 		} else {
-			document.querySelector('.results__block').insertAdjacentHTML("beforeend", str);
+			document.querySelector('.results__block').insertAdjacentHTML("beforeEnd", str);
 		}
 	}
 
@@ -383,7 +385,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (target.className === 'delete-icon') {
 				arData.id_input = target.parentElement.getAttribute('data-id');
 				arData.action = 'remove';
-				saveInput('JSON=' + JSON.stringify(arData), siteId);
+				updateInput('JSON=' + JSON.stringify(arData));
+				let parentBlock = target.closest('.results__field');
+				 if (parentBlock.closest('.block__value').childElementCount === 3) parentBlock.closest('.block__value').remove();
+				else parentBlock.remove();
 			}
 			if (target.className === 'add-block') {
 				arData.action = 'createTypeRow';
@@ -423,8 +428,25 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (id !== '') sendData("ID=" + id);
 			}
 		})
-
 			.catch(error => alert(error));
 	}
+	function updateInput(data) {
+		fetch(url, {
+			cache: "no-cache",
+			method: 'POST',
+			headers: {'Content-type': 'application/x-www-form-urlencoded'},
+			body: data
+		}).catch(error => alert(error));
+	}
+	// function createInput(data) {
+	// 	const response = fetch(url, {
+	// 		cache: "no-cache",
+	// 		method: 'POST',
+	// 		headers: {'Content-type': 'application/x-www-form-urlencoded'},
+	// 		body: data
+	// 	}).catch(error => alert(error));
+	// 	return response.json();
+	// }
+
 
 });
