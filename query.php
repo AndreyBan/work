@@ -59,23 +59,29 @@ if (!empty($_POST['JSON'])){
 			$sqlUpdate = "UPDATE `data` SET `data`.$inputName = '$inputValue' WHERE `data`.id_data = $inputId";
 		}
 		else $sqlUpdate = "UPDATE `type` SET `type`.TYPE_NAME = '$inputValue' WHERE `type`.id_type = $inputId";
+		if ($mysqli->query($sqlUpdate) === TRUE) {
+			echo "Record updated successfully";
+		} else {
+			echo "Error updating record: " . $mysqli->error;
+		}
 	}
 	if($action === 'add') {
 		$inputSite = $json->site;
-//		$mysqli->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
+		$mysqli->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
 		$sqlUpdate = "INSERT INTO `data` (`data`.VALUE, ID, `data`.id_type, FIELD) VALUES ('Значение', $inputSite, $inputId, 'Название')";
-//		$mysqli->query($sqlUpdate);
-//		$mysqli->commit();
-//		$sql = "SELECT `data`.id_data,
-// 				`data`.VALUE,
-// 				`data`.FIELD,
-// 				`type`.id_type,
-// 				`type`.TYPE_NAME
-// 		FROM `data` INNER JOIN `type` ON `data`.id_type = `type`.id_type WHERE `data`.id_data = LAST_INSERT_ID()";
-//		$result = $mysqli->query($sql);
-//		$arrRes = $result->fetch_all(MYSQLI_ASSOC);
-//		$arrRes = json_encode($arrRes, true);
-//		echo $arrRes;
+		$mysqli->query($sqlUpdate);
+		$mysqli->commit();
+		$sqlUpdate = "SELECT `data`.id_data,
+ 				`data`.VALUE,
+ 				`data`.FIELD,
+ 				`type`.id_type,
+ 				`type`.TYPE_NAME
+ 		FROM `data` INNER JOIN `type` ON `data`.id_type = `type`.id_type WHERE `data`.id_data = LAST_INSERT_ID()";
+		$result = $mysqli->query($sqlUpdate);
+		$arrRes = $result->fetch_all(MYSQLI_ASSOC);
+		$arrRes = json_encode($arrRes, true);
+		$mysqli->close();
+		echo $arrRes;
 	}
 	if($action === 'remove') {
 		$sqlUpdate = "DELETE FROM `data` WHERE `data`.id_data = $inputId";
@@ -106,6 +112,11 @@ if (!empty($_POST['JSON'])){
 			if($counter == $total) $str = $str . $item .")";
 		}
 		$sqlUpdate = "DELETE FROM `type` WHERE $str";
+		if ($mysqli->query($sqlUpdate) === TRUE) {
+			echo "Record updated successfully";
+		} else {
+			echo "Error updating record: " . $mysqli->error;
+		}
 	}
 	if($action === 'createTypeRow') {
 		$inputSite = $json->site;
@@ -117,11 +128,7 @@ if (!empty($_POST['JSON'])){
 		$mysqli->query($sqlUpdate);
 		$mysqli->close();
 	}
-	if ($mysqli->query($sqlUpdate) === TRUE) {
-		echo "Record updated successfully";
-	} else {
-		echo "Error updating record: " . $mysqli->error;
-	}
+
 }
 
 

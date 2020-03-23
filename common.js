@@ -231,6 +231,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				'<input type="text" class="name" data-name="FIELD" data-id="' + elId + '" value="' + fieldName + '"/>\n' +
 				'    <input type="text" class="results__value" data-clipboard-action="copy" data-clipboard-target="#field-' + elId + '"\n' +
 				'    data-id="' + elId + '" data-name="VALUE" value="' + fieldVal + '"/>\n' +
+				'<span class="delete-icon"></span>\n'+
 				'</div>',
 				block = document.querySelector('.block__value[data-name="' + type + '"][data-id="' + typeId + '"]');
 			block.insertAdjacentHTML("beforeend", str);
@@ -277,8 +278,14 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	/************Добавление поля со значениями (редактирование)************/
-	function addFieldValue() {
+	function addFieldValue(check = false) {
 		document.querySelectorAll('.block__value').forEach(function (el) {
+		if(check) {
+			let child = el.childNodes;
+			[].forEach.call(child, function (elem) {
+				if (elem.className === 'add-field') elem.remove();
+			});
+		}
 			let plus = document.createElement('div');
 
 			plus.className = 'add-field';
@@ -287,15 +294,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 
-	/************Создание иконки удаления(крестик рядом с полем) (редактирование)************/
-	function createIconDelete() {
-		document.querySelectorAll('.results__field').forEach(function (el) {
-			let deleteIcon = document.createElement('span');
 
-			deleteIcon.className = 'delete-icon';
-			el.append(deleteIcon);
-		});
-	}
 
 	/************Вывод результатов************/
 	function outputResults(elem) {
@@ -333,7 +332,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				if (modeEdit()) {
 					addFieldValue();
-					createIconDelete();
 					addBlockValue();
 				}
 			})
@@ -363,7 +361,21 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 	subitemChange[0].click();
 
-
+	function createInput(data) {
+		 fetch(url, {
+			cache: "no-cache",
+			method: 'POST',
+			headers: {'Content-type': 'application/x-www-form-urlencoded'},
+			body: data
+		})
+			.then(response => response.json())
+			.then(elem => {
+				elem = elem[0];
+				createField(elem.id_data, elem.TYPE_NAME, elem.FIELD, elem.VALUE, elem.id_type);
+				addFieldValue(true);
+			})
+			.catch(error => alert(error));
+	}
 	/*****************Сохранение полей*******************/
 	if (modeEdit()) {
 		resultBlock.onclick = function (e) {
@@ -380,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				arData.site = siteId;
 				arData.action = 'add';
 				arData.id_input = target.parentElement.getAttribute('data-id');
-				saveInput('JSON=' + JSON.stringify(arData), siteId);
+				createInput('JSON=' + JSON.stringify(arData));
 			}
 			if (target.className === 'delete-icon') {
 				arData.id_input = target.parentElement.getAttribute('data-id');
@@ -438,15 +450,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			body: data
 		}).catch(error => alert(error));
 	}
-	// function createInput(data) {
-	// 	const response = fetch(url, {
-	// 		cache: "no-cache",
-	// 		method: 'POST',
-	// 		headers: {'Content-type': 'application/x-www-form-urlencoded'},
-	// 		body: data
-	// 	}).catch(error => alert(error));
-	// 	return response.json();
-	// }
+
 
 
 });
