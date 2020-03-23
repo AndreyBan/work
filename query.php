@@ -62,7 +62,20 @@ if (!empty($_POST['JSON'])){
 	}
 	if($action === 'add') {
 		$inputSite = $json->site;
+//		$mysqli->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
 		$sqlUpdate = "INSERT INTO `data` (`data`.VALUE, ID, `data`.id_type, FIELD) VALUES ('Значение', $inputSite, $inputId, 'Название')";
+//		$mysqli->query($sqlUpdate);
+//		$mysqli->commit();
+//		$sql = "SELECT `data`.id_data,
+// 				`data`.VALUE,
+// 				`data`.FIELD,
+// 				`type`.id_type,
+// 				`type`.TYPE_NAME
+// 		FROM `data` INNER JOIN `type` ON `data`.id_type = `type`.id_type WHERE `data`.id_data = LAST_INSERT_ID()";
+//		$result = $mysqli->query($sql);
+//		$arrRes = $result->fetch_all(MYSQLI_ASSOC);
+//		$arrRes = json_encode($arrRes, true);
+//		echo $arrRes;
 	}
 	if($action === 'remove') {
 		$sqlUpdate = "DELETE FROM `data` WHERE `data`.id_data = $inputId";
