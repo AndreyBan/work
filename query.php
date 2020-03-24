@@ -143,6 +143,18 @@ if (!empty($_POST['JSON'])){
 		$sqlUpdate = "UPDATE `sites` SET `sites`.NAME = '$inputValue' WHERE `sites`.ID = $inputId";
 		$mysqli->query($sqlUpdate);
 	}
+	if($action === 'addSite') {
+		$mysqli->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
+		$sqlUpdate = "INSERT INTO `sites`  (`sites`.PID, `sites`.NAME ) VALUES ($inputId, 'Новый сайт')";
+		$mysqli->query($sqlUpdate);
+		$mysqli->commit();
+		$sqlUpdate = "SELECT `sites`.ID, `sites`.PID, `sites`.NAME FROM `sites` WHERE  `sites`.ID=LAST_INSERT_ID()";
+		$result = $mysqli->query($sqlUpdate);
+		$arrRes = $result->fetch_all(MYSQLI_ASSOC);
+		$arrRes = json_encode($arrRes, true);
+		$mysqli->close();
+		echo $arrRes;
+	}
 }
 
 

@@ -40,12 +40,14 @@ $path = '';
 				</ul>
 			</div>
 			<?php view_cat($arrSort); ?>
+			<?php if($modEdit){?>
 			<div class="add-section">Добавить раздел</div>
+			<?php } ?>
 		</div>
 		<div class="results__block">
 			<a class="title" href="https://agat-group.com" target="_blank">agat-group.com</a>
 			<div class="copyed__block">
-				<?php if(isset($_GET['admin'])){?>
+				<?php if(!$modEdit){?>
 					Сохранено
 				<?php }
 				else { ?>

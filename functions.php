@@ -61,7 +61,7 @@ function view_cat($arr, $pid = 0)
 		for ($i = 0; $i < count($arr[$pid]); $i++) {
 			if ($modEdit) {
 
-				echo '<li><div class="items__elem"> <input type="text" class="input-site" data-name="' . $arr[$pid][$i]["ID"] . '" value="'
+				echo '<li><div class="items__elem"> <input type="text" class="input-site" data-id="' . $arr[$pid][$i]["ID"] . '" value="'
 					. $arr[$pid][$i]["NAME"] . '" />'
 					. '<span>
                                     <i class="ico-arrow">
@@ -90,11 +90,11 @@ function view_cat($arr, $pid = 0)
 			}
 		}
 	} else {
-		echo '<ul class="subitem">';
+		echo '<ul class="subitem" data-id="'.$pid.'">';
 		for ($i = 0; $i < count($arr[$pid]); $i++) {
 			if ($modEdit) {
 				echo '<li id="' . $arr[$pid][$i]["ID"]
-					. '"> <input type="text" class="input-site" data-name="' . $arr[$pid][$i]["ID"] . '" value="'
+					. '"> <input type="text" class="input-site" data-id="' . $arr[$pid][$i]["ID"] . '" value="'
 					. $arr[$pid][$i]["NAME"] .'"/>'
 					. '</li>';
 			}

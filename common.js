@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	let url = 'query.php',
 		itemChange = document.querySelectorAll('.items__elem'),
-		subitemChange = document.querySelectorAll('.subitem li'),
+		subitemChange = document.querySelectorAll('.subitem li:not(.btn-add-site)'),
 		fieldSearch = document.querySelector('.search'),
 		promptList = document.querySelector('.prompt__list'),
 		promptBlock = document.querySelector('.prompt'),
@@ -388,14 +388,22 @@ function changePrompt(){
 						addFieldValue(true);
 						addBlockValue();
 						break;
+					case "addSite":
+						addSite(elem.PID, elem.ID, elem.NAME);
 					default:
 						return false;
 				}
 			})
 			.catch(error => alert(error));
 	}
+function addSite(pid, id, name) {
+	let section = document.querySelector('.subitem[data-id="' + pid + '"]').lastElementChild,
 
-	/*****************Сохранение полей*******************/
+		str = '<li id="' + id + '"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"></li>';
+	section.insertAdjacentHTML('beforebegin', str);
+
+}
+	/*****************Сохранение/добавление полей*******************/
 	if (modeEdit()) {
 		resultBlock.onclick = function (e) {
 			let target = e.target,
@@ -439,7 +447,6 @@ function changePrompt(){
 				arData.value = target.value;
 				arData.type = target.closest('.block__value').getAttribute('data-name');
 				arData.name = target.getAttribute('data-name');
-
 				saveInput('JSON=' + JSON.stringify(arData));
 			}
 		};
@@ -453,11 +460,23 @@ function changePrompt(){
 				let arData = {};
 				arData.action = 'saveGroup';
 				arData.value = target.value;
-				arData.id_input = target.getAttribute('data-name');
+				arData.id_input = target.getAttribute('data-id');
 				saveInput('JSON=' + JSON.stringify(arData));
 			}
-		})
+		});
+
+		siteBlock.addEventListener('click', function (e) {
+			let target = e.target,
+				targetClass = target.className;
+			if(targetClass === 'btn-add-site'){
+				let arData = {};
+				arData.action = 'addSite';
+				arData.id_input = target.closest('.subitem').getAttribute('data-id');
+				updateInput('JSON=' + JSON.stringify(arData));
+			}
+		});
 	}
+
 
 	function saveInput(data, id = '') {
 		fetch(url, {
@@ -482,4 +501,7 @@ function changePrompt(){
 			body: data
 		}).catch(error => alert(error));
 	}
+
+
+
 });
