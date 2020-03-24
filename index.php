@@ -1,7 +1,8 @@
 <?php
 header("Content-Type: text/html; charset=UTF8");
+$modEdit = false;
+if(isset($_GET["admin"])) $modEdit = true;
 include 'functions.php';
-//include 'query.php';
 $arrItems = call_db(HOST, USER, PASS, DB);
 $arrSort = getSortArr($arrItems);
 $path = '';
@@ -36,22 +37,10 @@ $path = '';
 			<div class="prompt">
 				<div class="prompt__separate"></div>
 				<ul class="prompt__list">
-
 				</ul>
 			</div>
-
-			<?php view_cat($arrSort);
-			if(isset($_GET['admin'])){?>
-			<button class="edit_elements">Редактировать
-				<span>
-					<i class="ico-edit">
-						<svg width="14" height="14">
-							<use xlink:href="<?= $path . '/img/map.svg#edit' ?>"/>
-						</svg>
-					</i>
-				</span>
-			</button>
-			<?php } ?>
+			<?php view_cat($arrSort); ?>
+			<div class="add-section">Добавить раздел</div>
 		</div>
 		<div class="results__block">
 			<a class="title" href="https://agat-group.com" target="_blank">agat-group.com</a>

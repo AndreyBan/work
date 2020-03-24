@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						}
 					});
 				} else if (e.code === 'ArrowUp' && numberPrompt - 1 >= 0) {
+					e.preventDefault();
 					numberPrompt--;
 					promptItem.forEach(function (item, i) {
 						if (i === numberPrompt) {
@@ -136,6 +137,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				item.addEventListener('click', function () {
 					fieldSearch.value = this.innerText;
 					removeChangeSubItem();
+					let elementId = item.getAttribute('data-id');
+					document.getElementById(elementId).click();
 				});
 			});
 		});
@@ -237,17 +240,19 @@ document.addEventListener('DOMContentLoaded', function () {
 			block.insertAdjacentHTML("beforeend", str);
 		}
 	}
+function changePrompt(){
+	let promptItemSelect = document.querySelector('.prompt__item.active'),
+		promptItemValId = promptItemSelect.getAttribute('data-id'),
+		bodyText = 'ID=' + promptItemValId;
 
-	fieldSearch.onkeydown = function (e) {
+	sendData(bodyText);
+}
+	fieldSearch.addEventListener('keydown', function (e) {
 		if (e.key === 'Enter') {
-
-			let promptItemSelect = document.querySelector('.prompt__item.active'),
-				promptItemValId = promptItemSelect.getAttribute('data-id'),
-				bodyText = 'ID=' + promptItemValId;
-
-			sendData(bodyText);
+			changePrompt();
 		}
-	};
+	});
+
 
 	/********* Выводим результаты с паролями *************/
 	function removeValue() {
@@ -361,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 	subitemChange[0].click();
 
-	function createInput(data) {
+	function updateInput(data) {
 		 fetch(url, {
 			cache: "no-cache",
 			method: 'POST',
@@ -370,12 +375,26 @@ document.addEventListener('DOMContentLoaded', function () {
 		})
 			.then(response => response.json())
 			.then(elem => {
-				elem = elem[0];
-				createField(elem.id_data, elem.TYPE_NAME, elem.FIELD, elem.VALUE, elem.id_type);
-				addFieldValue(true);
+				let arData = JSON.parse(data.replace('JSON=', ''));
+					elem = elem[0];
+				switch (arData.action) {
+					case "add":
+						createField(elem.id_data, elem.TYPE_NAME, elem.FIELD, elem.VALUE, elem.id_type);
+						addFieldValue(true);
+						break;
+					case "createTypeRow":
+						createValueBlock(elem.TYPE_NAME, elem.id_type);
+						createField(elem.id_data, elem.TYPE_NAME, elem.FIELD, elem.VALUE, elem.id_type);
+						addFieldValue(true);
+						addBlockValue();
+						break;
+					default:
+						return false;
+				}
 			})
 			.catch(error => alert(error));
 	}
+
 	/*****************Сохранение полей*******************/
 	if (modeEdit()) {
 		resultBlock.onclick = function (e) {
@@ -392,12 +411,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				arData.site = siteId;
 				arData.action = 'add';
 				arData.id_input = target.parentElement.getAttribute('data-id');
-				createInput('JSON=' + JSON.stringify(arData));
+				updateInput('JSON=' + JSON.stringify(arData));
 			}
 			if (target.className === 'delete-icon') {
 				arData.id_input = target.parentElement.getAttribute('data-id');
 				arData.action = 'remove';
-				updateInput('JSON=' + JSON.stringify(arData));
+				removeInput('JSON=' + JSON.stringify(arData));
 				let parentBlock = target.closest('.results__field');
 				 if (parentBlock.closest('.block__value').childElementCount === 3) parentBlock.closest('.block__value').remove();
 				else parentBlock.remove();
@@ -405,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (target.className === 'add-block') {
 				arData.action = 'createTypeRow';
 				arData.site = siteId;
-				saveInput('JSON=' + JSON.stringify(arData), siteId);
+				updateInput('JSON=' + JSON.stringify(arData));
 			}
 		};
 
@@ -424,6 +443,20 @@ document.addEventListener('DOMContentLoaded', function () {
 				saveInput('JSON=' + JSON.stringify(arData));
 			}
 		};
+
+		let siteBlock = document.querySelector('.side-bar__block');
+
+		siteBlock.addEventListener('change', function (e) {
+			let target = e.target,
+				targetClass = target.className;
+			if(targetClass === 'input-site'){
+				let arData = {};
+				arData.action = 'saveGroup';
+				arData.value = target.value;
+				arData.id_input = target.getAttribute('data-name');
+				saveInput('JSON=' + JSON.stringify(arData));
+			}
+		})
 	}
 
 	function saveInput(data, id = '') {
@@ -436,13 +469,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (successResponse.status !== 200) {
 				alert(successResponse.status + ': ' + successResponse.statusText);
-			} else {
-				if (id !== '') sendData("ID=" + id);
 			}
 		})
 			.catch(error => alert(error));
 	}
-	function updateInput(data) {
+
+	function removeInput(data) {
 		fetch(url, {
 			cache: "no-cache",
 			method: 'POST',
@@ -450,7 +482,4 @@ document.addEventListener('DOMContentLoaded', function () {
 			body: data
 		}).catch(error => alert(error));
 	}
-
-
-
 });

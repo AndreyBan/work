@@ -106,6 +106,29 @@ header h1 {
 .side-bar__block ul li {
     list-style: none;
 }
+.side-bar__block .items__elem input{
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid #5A6BFF;
+    color: #5A6BFF;
+}
+.side-bar__block .items__elem.active input,
+.side-bar__block .items__elem:hover input{
+    background-color: transparent;
+    border-bottom: 1px solid #fff;
+    color: #fff;
+}
+.side-bar__block .items__elem input:focus{
+    box-shadow: none;
+    border-bottom: 1px solid #5A6BFF;
+}
+.side-bar__block .items__elem:hover input:focus{
+    border-bottom: 1px solid #fff;
+}
+.side-bar__block .items__elem.active input:focus{
+    border-bottom: 1px solid #fff;
+}
 
 .side-bar__block .items__elem,
 .subitem li {
@@ -120,7 +143,17 @@ header h1 {
     font-size: 1.125rem;
     border-bottom: 1px solid #d7d7d7;
 }
-
+.side-bar__block .subitem input{
+    border: none;
+    color: #5A6BFF;
+    background-color: transparent;
+    border-bottom: 1px solid #5A6BFF;
+    border-radius: 0;
+}
+.side-bar__block .subitem input:focus{
+    box-shadow: none;
+    border-bottom: 1px solid #5A6BFF;
+}
 .side-bar__block input {
     margin-left: 28px;
     border: 1px solid #B0B0B0;
@@ -131,7 +164,24 @@ header h1 {
     padding: 6px 18px;
     box-sizing: border-box;
 }
-
+.add-section:hover{
+    background-color: rgba(88,155,255, 1);
+    transition: .2s;
+}
+.add-section{
+    color: #ffffff;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    padding: 14px 0;
+    font-size: 14px;
+    background-color: rgba(86, 154, 255, .7);
+    display: block;
+    max-width: calc(100% - 56px);
+    margin: 28px auto 0;
+    border-radius: 4px;
+    transition: .2s;
+}
 .side-bar__block input:focus {
     border: none;
     box-shadow: 0 0 6px rgba(0, 0, 0, .3);
@@ -485,7 +535,8 @@ header h1 {
     right: 10px;
     cursor: pointer;
 }
-.add-field{
+.add-field,
+.add-site{
     margin: 0 auto 12px;
     width: 32px;
     height: 32px;
@@ -501,8 +552,12 @@ header h1 {
     content: '+';
     font-size: 28px;
     color: #FFFFFF;
+    letter-spacing: 0;
 }
-
+.add-site{
+    margin: 0;
+    pointer-events: none;
+}
 .add-field:hover{
     background-color: rgba(88,155,255, 1);
     transition: .2s;
@@ -528,6 +583,7 @@ header h1 {
     border-top: 6px solid rgba(86, 154, 255, .7);
 }
 
+
 .ico-copy {
     pointer-events: none;
 }
@@ -539,14 +595,14 @@ header h1 {
     margin-top: 32px;
 }
 .block__value {
-    padding-bottom: 36px;
+    padding-bottom: 48px;
 }
 .block__value:not(:last-child) {
     border-bottom: 1px dashed #d7d7d7;
 }
 .add-block{
     color: #fff;
-    margin: 0 auto;
+    margin: 24px auto 0;
     clear: both;
     display: block;
     text-align: center;

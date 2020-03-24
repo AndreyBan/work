@@ -126,9 +126,23 @@ if (!empty($_POST['JSON'])){
 		$mysqli->commit();
 		$sqlUpdate = "INSERT INTO `data` (`data`.VALUE, ID, `data`.id_type, FIELD) VALUES ('Значение', $inputSite, LAST_INSERT_ID(), 'Название')";
 		$mysqli->query($sqlUpdate);
+		$mysqli->commit();
+		$sqlUpdate = "SELECT `data`.id_data,
+ 				`data`.VALUE,
+ 				`data`.FIELD,
+ 				`type`.id_type,
+ 				`type`.TYPE_NAME
+ 		FROM `data` INNER JOIN `type` ON `data`.id_type = `type`.id_type WHERE `data`.id_data = LAST_INSERT_ID()";
+		$result = $mysqli->query($sqlUpdate);
+		$arrRes = $result->fetch_all(MYSQLI_ASSOC);
+		$arrRes = json_encode($arrRes, true);
 		$mysqli->close();
+		echo $arrRes;
 	}
-
+	if($action === 'saveGroup') {
+		$sqlUpdate = "UPDATE `sites` SET `sites`.NAME = '$inputValue' WHERE `sites`.ID = $inputId";
+		$mysqli->query($sqlUpdate);
+	}
 }
 
 
