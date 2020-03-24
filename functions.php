@@ -96,7 +96,7 @@ function view_cat($arr, $pid = 0)
 				echo '<li id="' . $arr[$pid][$i]["ID"]
 					. '"> <input type="text" class="input-site" data-id="' . $arr[$pid][$i]["ID"] . '" value="'
 					. $arr[$pid][$i]["NAME"] .'"/>'
-					. '</li>';
+					. '<span class="delete-icon"></span></li>';
 			}
 			else{
 				echo '<li id="' . $arr[$pid][$i]["ID"]

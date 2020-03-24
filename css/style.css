@@ -149,6 +149,7 @@ header h1 {
     background-color: transparent;
     border-bottom: 1px solid #5A6BFF;
     border-radius: 0;
+    padding: 6px;
 }
 .side-bar__block .subitem input:focus{
     box-shadow: none;
@@ -560,10 +561,10 @@ header h1 {
 }
 .add-field:hover{
     background-color: rgba(88,155,255, 1);
-    transition: .2s;
+    transition-duration: .2s;
 }
 
-.add-field:hover:after{
+.add-field:after{
     content: 'Добавить поле';
     white-space: nowrap;
     font-size: 14px;
@@ -573,17 +574,31 @@ header h1 {
     padding: 8px 16px;
     position: absolute;
     background-color: rgba(86, 154, 255, .7);
+    visibility: hidden;
+    opacity: 0;
 }
 
-.add-field:hover:before{
+.add-field:before{
     content: '';
     position: absolute;
     top: -6px;
     border: 6px solid transparent;
     border-top: 6px solid rgba(86, 154, 255, .7);
+    visibility: hidden;
+    opacity: 0;
 }
-
-
+.add-field:hover:after{
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 1s;
+    transition-duration: .2s;
+}
+.add-field:hover:before{
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 1s;
+    transition-duration: .2s;
+}
 .ico-copy {
     pointer-events: none;
 }
@@ -606,7 +621,7 @@ header h1 {
     clear: both;
     display: block;
     text-align: center;
-    padding: 10px 16px;
+    padding: 14px 16px;
     cursor: pointer;
     border-radius: 4px;
     background-color: rgba(86, 154, 255, .7);
@@ -614,6 +629,13 @@ header h1 {
 .add-block:hover{
     background-color: rgba(88,155,255, 1);
     transition: .2s;
+}
+.subitem .delete-icon {
+    position: relative;
+    right: auto;
+    left: 4px;
+     display: inline;
+    cursor: pointer;
 }
 .delete-icon{
     position: absolute;

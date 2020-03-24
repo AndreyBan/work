@@ -390,18 +390,24 @@ function changePrompt(){
 						break;
 					case "addSite":
 						addSite(elem.PID, elem.ID, elem.NAME);
+						break;
 					default:
 						return false;
 				}
 			})
 			.catch(error => alert(error));
 	}
+
+	/********************Добавление сайта********************/
 function addSite(pid, id, name) {
 	let section = document.querySelector('.subitem[data-id="' + pid + '"]').lastElementChild,
+		str = '<li id="' + id + '"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span class="delete-icon"></span></li>';
 
-		str = '<li id="' + id + '"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"></li>';
 	section.insertAdjacentHTML('beforebegin', str);
-
+}
+	/********************удаление сайта********************/
+function removeSite(id) {
+	document.getElementById(id).remove();
 }
 	/*****************Сохранение/добавление полей*******************/
 	if (modeEdit()) {
@@ -468,11 +474,18 @@ function addSite(pid, id, name) {
 		siteBlock.addEventListener('click', function (e) {
 			let target = e.target,
 				targetClass = target.className;
+			let arData = {};
+
 			if(targetClass === 'btn-add-site'){
-				let arData = {};
 				arData.action = 'addSite';
 				arData.id_input = target.closest('.subitem').getAttribute('data-id');
 				updateInput('JSON=' + JSON.stringify(arData));
+			}
+			if(targetClass === 'delete-icon'){
+				arData.action = 'removeSite';
+				arData.id_input = target.previousElementSibling.getAttribute('data-id');
+				removeInput('JSON=' + JSON.stringify(arData));
+				removeSite(arData.id_input);
 			}
 		});
 	}

@@ -155,6 +155,10 @@ if (!empty($_POST['JSON'])){
 		$mysqli->close();
 		echo $arrRes;
 	}
+	if($action === 'removeSite') {
+		$sqlUpdate = "DELETE FROM `sites` WHERE `sites`.ID = $inputId";
+		$mysqli->query($sqlUpdate);
+	}
 }
 
 
