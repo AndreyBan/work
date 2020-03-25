@@ -2,13 +2,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	let url = 'query.php',
 		itemChange = document.querySelectorAll('.items__elem'),
+		blockItems = document.querySelector('.items'),
 		subitemChange = document.querySelectorAll('.subitem li:not(.btn-add-site)'),
 		fieldSearch = document.querySelector('.search'),
 		promptList = document.querySelector('.prompt__list'),
 		promptBlock = document.querySelector('.prompt'),
 		copyedBlock = document.querySelector('.copyed__block'),
 		strGET = window.location.search.replace('?', '');
-
 
 	function modeEdit() {
 		return strGET === 'admin';
@@ -18,27 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		new ClipboardJS('.copy-icon'); //Покдлючаем копирование по кнопке
 		new ClipboardJS('.results__value'); //Покдлючаем копирование по полю с паролем
 	}
-
-	/********Делаем открытие подменю************/
-
-	itemChange.forEach(function (item) {
-
-		item.onclick = function () {
-			if (item.classList.contains('active')) {
-				item.classList.remove('active');
-				item.nextElementSibling.classList.remove('open');
-			} else {
-				itemChange.forEach(function (el) {
-					if (el.classList.contains('active')) {
-						el.classList.remove('active');
-						el.nextElementSibling.classList.remove('open');
-					}
-				});
-				item.classList.add('active');
-				item.nextElementSibling.classList.add('open');
-			}
-		};
-	});
 
 
 	/*********Прячем выпадающую подсказку с сайтами при потере фокуса с поля поиска**************/
@@ -153,9 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 	let resultBlock = document.querySelector('.results__block');
-	// fieldSite = document.getElementById('popup-site'),
-	// popupBlockFirst = document.querySelector('.popup__block:first-child'),
-	// siteNamePopUp = document.querySelector('.site-name');
+
 
 	/********** Показываем всплывашку с надписью скопировано при клике по значку копирования или полю*********/
 	function textCopy() {
@@ -177,20 +154,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (targetParent.classList.contains('hide')) targetParent.classList.remove('hide');
 				else targetParent.classList.add('hide');
 			}
-
 		};
 	}
-
-	// fieldSite.addEventListener('change', function () {
-	// 	if (fieldSite.value === 'new') {
-	// 		popupBlockFirst.style.width = '49%';
-	// 		siteNamePopUp.style.display = 'inline-block';
-	// 	} else {
-	// 		popupBlockFirst.style.width = '100%';
-	// 		siteNamePopUp.style.display = 'none';
-	// 	}
-	// });
-
 
 	function createValueBlock(type, id) {
 		let div = document.createElement('div');
@@ -234,19 +199,21 @@ document.addEventListener('DOMContentLoaded', function () {
 				'<input type="text" class="name" data-name="FIELD" data-id="' + elId + '" value="' + fieldName + '"/>\n' +
 				'    <input type="text" class="results__value" data-clipboard-action="copy" data-clipboard-target="#field-' + elId + '"\n' +
 				'    data-id="' + elId + '" data-name="VALUE" value="' + fieldVal + '"/>\n' +
-				'<span class="delete-icon"></span>\n'+
+				'<span class="delete-icon"></span>\n' +
 				'</div>',
 				block = document.querySelector('.block__value[data-name="' + type + '"][data-id="' + typeId + '"]');
 			block.insertAdjacentHTML("beforeend", str);
 		}
 	}
-function changePrompt(){
-	let promptItemSelect = document.querySelector('.prompt__item.active'),
-		promptItemValId = promptItemSelect.getAttribute('data-id'),
-		bodyText = 'ID=' + promptItemValId;
 
-	sendData(bodyText);
-}
+	function changePrompt() {
+		let promptItemSelect = document.querySelector('.prompt__item.active'),
+			promptItemValId = promptItemSelect.getAttribute('data-id'),
+			bodyText = 'ID=' + promptItemValId;
+
+		sendData(bodyText);
+	}
+
 	fieldSearch.addEventListener('keydown', function (e) {
 		if (e.key === 'Enter') {
 			changePrompt();
@@ -267,10 +234,9 @@ function changePrompt(){
 	function addBlockValue() {
 		let str = `<div class="add-block">Добавить блок</div>`;
 
-
 		if (document.querySelector('.results__block .block__value')) {
 			let rbBlockValue = document.querySelectorAll('.block__value');
-			if(document.querySelector('.results__block > .add-block')){
+			if (document.querySelector('.results__block > .add-block')) {
 				document.querySelector('.results__block > .add-block').remove();
 			}
 			rbBlockValue.forEach(function (item, index) {
@@ -285,12 +251,12 @@ function changePrompt(){
 	/************Добавление поля со значениями (редактирование)************/
 	function addFieldValue(check = false) {
 		document.querySelectorAll('.block__value').forEach(function (el) {
-		if(check) {
-			let child = el.childNodes;
-			[].forEach.call(child, function (elem) {
-				if (elem.className === 'add-field') elem.remove();
-			});
-		}
+			if (check) {
+				let child = el.childNodes;
+				[].forEach.call(child, function (elem) {
+					if (elem.className === 'add-field') elem.remove();
+				});
+			}
 			let plus = document.createElement('div');
 
 			plus.className = 'add-field';
@@ -298,7 +264,6 @@ function changePrompt(){
 			el.append(plus);
 		});
 	}
-
 
 
 	/************Вывод результатов************/
@@ -343,31 +308,50 @@ function changePrompt(){
 			.catch(error => alert(error));
 	}
 
+	blockItems.addEventListener('click', function (e) {
+		let target = e.target;
+		if (target.className === 'section-elem') {
+			/********Делаем открытие подменю************/
 
-	subitemChange.forEach(function (item) {
-		item.addEventListener('click', function () {
+			if (target.firstChild.classList.contains('active')) {
+				target.firstChild.classList.remove('active');
+				target.firstChild.nextElementSibling.classList.remove('open');
+			} else {
+				itemChange.forEach(function (el) {
+					if (el.classList.contains('active')) {
+						el.classList.remove('active');
+						el.nextElementSibling.classList.remove('open');
+					}
+				});
+				target.classList.add('active');
+				target.nextElementSibling.classList.add('open');
+			}
+		}
+
+		if (target.className === 'subitem-element') {
 			if (document.querySelector('.add-block')) {
 				document.querySelector('.add-block').remove();
 			}
-			let subitemId = this.id,
+			let subitemId = target.id,
 				bodytext = "ID=" + subitemId;
 
 			fieldSearch.value = '';
-			if (!item.classList.contains('change')) {
+			if (!target.classList.contains('change')) {
 				subitemChange.forEach(function (el) {
 					if (el.classList.contains('change')) {
 						el.classList.remove('change');
 					}
 				});
-				item.classList.add('change');
+				target.classList.add('change');
 			}
 			sendData(bodytext);
-		});
+		}
 	});
+
 	subitemChange[0].click();
 
 	function updateInput(data) {
-		 fetch(url, {
+		fetch(url, {
 			cache: "no-cache",
 			method: 'POST',
 			headers: {'Content-type': 'application/x-www-form-urlencoded'},
@@ -376,7 +360,7 @@ function changePrompt(){
 			.then(response => response.json())
 			.then(elem => {
 				let arData = JSON.parse(data.replace('JSON=', ''));
-					elem = elem[0];
+				elem = elem[0];
 				switch (arData.action) {
 					case "add":
 						createField(elem.id_data, elem.TYPE_NAME, elem.FIELD, elem.VALUE, elem.id_type);
@@ -391,6 +375,9 @@ function changePrompt(){
 					case "addSite":
 						addSite(elem.PID, elem.ID, elem.NAME);
 						break;
+					case "addSection":
+						addSection(elem.ID, elem.NAME);
+						break;
 					default:
 						return false;
 				}
@@ -398,17 +385,40 @@ function changePrompt(){
 			.catch(error => alert(error));
 	}
 
-	/********************Добавление сайта********************/
-function addSite(pid, id, name) {
-	let section = document.querySelector('.subitem[data-id="' + pid + '"]').lastElementChild,
-		str = '<li id="' + id + '"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span class="delete-icon"></span></li>';
+	/********************Добавление раздела********************/
+	function addSection(id, name) {
+		let section = document.querySelector('.items'),
+			str = '<li > <div class="items__elem"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span>' +
+				'<i class="ico-arrow">' +
+				'<svg width="12" height="12">' +
+				'<use xlink:href="/img/map.svg#arrow-down"></use>' +
+				'</svg>' +
+				'</i>' +
+				'</span>' +
+				'</div>' +
 
-	section.insertAdjacentHTML('beforebegin', str);
-}
+				'<ul class="subitem" data-id="' + id + '">' +
+				'<li class="btn-add-site">Добавить сайт <span class="add-site">+</span></li>' +
+				'</ul>' +
+				'</li>';
+
+		section.insertAdjacentHTML('beforeend', str);
+	}
+
+	/********************Добавление сайта********************/
+	function addSite(pid, id, name) {
+		let section = document.querySelector('.subitem[data-id="' + pid + '"]').lastElementChild,
+			str = '<li class="subitem-element" id="' + id + '"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span class="delete-icon"></span></li>';
+
+		section.insertAdjacentHTML('beforebegin', str);
+	}
+
 	/********************удаление сайта********************/
-function removeSite(id) {
-	document.getElementById(id).remove();
-}
+	function removeSite(id) {
+		document.getElementById(id).remove();
+		subitemChange[0].click();
+	}
+
 	/*****************Сохранение/добавление полей*******************/
 	if (modeEdit()) {
 		resultBlock.onclick = function (e) {
@@ -432,7 +442,7 @@ function removeSite(id) {
 				arData.action = 'remove';
 				removeInput('JSON=' + JSON.stringify(arData));
 				let parentBlock = target.closest('.results__field');
-				 if (parentBlock.closest('.block__value').childElementCount === 3) parentBlock.closest('.block__value').remove();
+				if (parentBlock.closest('.block__value').childElementCount === 3) parentBlock.closest('.block__value').remove();
 				else parentBlock.remove();
 			}
 			if (target.className === 'add-block') {
@@ -453,6 +463,10 @@ function removeSite(id) {
 				arData.value = target.value;
 				arData.type = target.closest('.block__value').getAttribute('data-name');
 				arData.name = target.getAttribute('data-name');
+				if (target.classList.contains('subtitle')) {
+					target.closest('.block__value').setAttribute('data-name', target.value);
+				}
+				target.setAttribute('value', target.value);
 				saveInput('JSON=' + JSON.stringify(arData));
 			}
 		};
@@ -462,7 +476,7 @@ function removeSite(id) {
 		siteBlock.addEventListener('change', function (e) {
 			let target = e.target,
 				targetClass = target.className;
-			if(targetClass === 'input-site'){
+			if (targetClass === 'input-site') {
 				let arData = {};
 				arData.action = 'saveGroup';
 				arData.value = target.value;
@@ -470,26 +484,33 @@ function removeSite(id) {
 				saveInput('JSON=' + JSON.stringify(arData));
 			}
 		});
-
+		/***************Действия над сайтами**********************/
 		siteBlock.addEventListener('click', function (e) {
 			let target = e.target,
 				targetClass = target.className;
 			let arData = {};
+			switch (targetClass) {
+				case "btn-add-site":
+					arData.action = 'addSite';
+					arData.id_input = target.closest('.subitem').getAttribute('data-id');
+					updateInput('JSON=' + JSON.stringify(arData));
+					break;
+				case "delete-icon":
+					arData.action = 'removeSite';
+					arData.id_input = target.previousElementSibling.getAttribute('data-id');
+					removeInput('JSON=' + JSON.stringify(arData));
+					removeSite(arData.id_input);
+					break;
+				case "add-section":
+					arData.action = 'addSection';
+					updateInput('JSON=' + JSON.stringify(arData));
+					break;
 
-			if(targetClass === 'btn-add-site'){
-				arData.action = 'addSite';
-				arData.id_input = target.closest('.subitem').getAttribute('data-id');
-				updateInput('JSON=' + JSON.stringify(arData));
-			}
-			if(targetClass === 'delete-icon'){
-				arData.action = 'removeSite';
-				arData.id_input = target.previousElementSibling.getAttribute('data-id');
-				removeInput('JSON=' + JSON.stringify(arData));
-				removeSite(arData.id_input);
+				default:
+					return false;
 			}
 		});
 	}
-
 
 	function saveInput(data, id = '') {
 		fetch(url, {

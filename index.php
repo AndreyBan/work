@@ -15,7 +15,7 @@ $path = '';
 		  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<link rel="stylesheet" href="css/style.css?v=<?php echo time() ?>">
-	<title>Document</title>
+	<title>Менеджер паролей</title>
 </head>
 
 <body>
@@ -47,12 +47,7 @@ $path = '';
 		<div class="results__block">
 			<a class="title" href="https://agat-group.com" target="_blank">agat-group.com</a>
 			<div class="copyed__block">
-				<?php if(!$modEdit){?>
-					Сохранено
-				<?php }
-				else { ?>
-				Скопировано
-				<?php } ?>
+				<?= $modEdit ? "Сохранено" : "Скопировано" ?>
 			</div>
 		</div>
 	</div>
