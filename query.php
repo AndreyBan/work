@@ -6,6 +6,40 @@ if ($mysqli->connect_error) {
 	die('Ошибка подключения(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
 }
 
+function deleteSites($mysqli){
+	$sql = "SELECT `data`.id_type FROM `data`";
+	$resData = $mysqli->query($sql);
+	$arResData = $resData->fetch_all(MYSQLI_ASSOC);
+	$sql = "SELECT `type`.id_type FROM `type`";
+	$resType = $mysqli->query($sql);
+	$arResType = $resType->fetch_all(MYSQLI_ASSOC);
+	$arValueType = [];
+	$arValueData = [];
+
+	foreach ($arResType as $arItem){
+		$arValueType[] = $arItem["id_type"];
+	}
+	foreach ($arResData as $arItem){
+		$arValueData[] = $arItem["id_type"];
+	}
+	$arRes = array_diff($arValueType, $arValueData);
+	$str = '`type`.id_type IN';
+	$counter = 0;
+	$total = count($arRes);
+	foreach ($arRes as $i => $item){
+		$counter++;
+		if($counter == 1) $str = $str ." (" . $item .",";
+		elseif ($counter !== $total) $str = $str . $item .",";
+		if($counter == $total) $str = $str . $item .")";
+	}
+	$sqlUpdate = "DELETE FROM `type` WHERE $str";
+	if ($mysqli->query($sqlUpdate) === TRUE) {
+		echo "Record updated successfully";
+	} else {
+		echo "Error updating record: " . $mysqli->error;
+	}
+}
+
 
 if (!empty($_POST['ID']) && empty($_POST['JSON'])){
 	$id = $_POST['ID'];
@@ -86,37 +120,7 @@ if (!empty($_POST['JSON'])){
 	if($action === 'remove') {
 		$sqlUpdate = "DELETE FROM `data` WHERE `data`.id_data = $inputId";
 		$mysqli->query($sqlUpdate);
-		$sql = "SELECT `data`.id_type FROM `data`";
-		$resData = $mysqli->query($sql);
-		$arResData = $resData->fetch_all(MYSQLI_ASSOC);
-		$sql = "SELECT `type`.id_type FROM `type`";
-		$resType = $mysqli->query($sql);
-		$arResType = $resType->fetch_all(MYSQLI_ASSOC);
-		$arValueType = [];
-		$arValueData = [];
-
-		foreach ($arResType as $arItem){
-			$arValueType[] = $arItem["id_type"];
-		}
-		foreach ($arResData as $arItem){
-			$arValueData[] = $arItem["id_type"];
-		}
-		$arRes = array_diff($arValueType, $arValueData);
-		$str = '`type`.id_type IN';
-		$counter = 0;
-		$total = count($arRes);
-		foreach ($arRes as $i => $item){
-			$counter++;
-			if($counter == 1) $str = $str ." (" . $item .",";
-			elseif ($counter !== $total) $str = $str . $item .",";
-			if($counter == $total) $str = $str . $item .")";
-		}
-		$sqlUpdate = "DELETE FROM `type` WHERE $str";
-		if ($mysqli->query($sqlUpdate) === TRUE) {
-			echo "Record updated successfully";
-		} else {
-			echo "Error updating record: " . $mysqli->error;
-		}
+		deleteSites($mysqli);
 	}
 	if($action === 'createTypeRow') {
 		$inputSite = $json->site;
@@ -156,8 +160,11 @@ if (!empty($_POST['JSON'])){
 		echo $arrRes;
 	}
 	if($action === 'removeSite') {
-		$sqlUpdate = "DELETE FROM `sites` WHERE `sites`.ID = $inputId";
+		$sqlUpdate = "DELETE FROM `data` WHERE `data`.ID = $inputId";
 		$mysqli->query($sqlUpdate);
+		$sql = "DELETE FROM `sites` WHERE `sites`.ID = $inputId";
+		$mysqli->query($sql);
+		deleteSites($mysqli);
 	}
 }
 

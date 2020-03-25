@@ -514,7 +514,4 @@ function removeSite(id) {
 			body: data
 		}).catch(error => alert(error));
 	}
-
-
-
 });
