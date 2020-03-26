@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	let url = 'query.php',
 		itemChange = document.querySelectorAll('.items__elem'),
 		blockItems = document.querySelector('.items'),
+		blockItemsLi = document.querySelectorAll('.items>li'),
 		subitemChange = document.querySelectorAll('.subitem li:not(.btn-add-site)'),
 		fieldSearch = document.querySelector('.search'),
 		promptList = document.querySelector('.prompt__list'),
@@ -18,7 +19,55 @@ document.addEventListener('DOMContentLoaded', function () {
 		new ClipboardJS('.copy-icon'); //Покдлючаем копирование по кнопке
 		new ClipboardJS('.results__value'); //Покдлючаем копирование по полю с паролем
 	}
+	if (modeEdit) {
+		let observer = new MutationObserver(() => {
+			let itemChange = document.querySelectorAll('.items__elem');
 
+			itemChange.forEach(function (el) {
+				openMenu(el);
+			});
+		});
+		observer.observe(blockItems, {
+			childList: true
+		});
+
+		function getStrAddSite(id) {
+			let strAddSite = '<ul class="subitem" data-id="' + id + '"><li class="btn-add-site">Добавить сайт <span class="add-site">+</span></li></ul>';
+			return strAddSite;
+		}
+
+		blockItemsLi.forEach(function (el) {
+			let classEl = el.lastChild;
+			if (!classEl.classList.contains('subitem')) {
+				let subitemId = el.firstElementChild.firstElementChild.getAttribute("data-id"),
+					str = getStrAddSite(subitemId);
+				el.insertAdjacentHTML('beforeend', str);
+			}
+		});
+	}
+
+	/***********Открыть/закрыть подменю*********/
+	function openMenu(el) {
+		el.addEventListener('click', function () {
+			if (el.classList.contains('active')) {
+				el.classList.remove('active');
+				el.nextElementSibling.classList.remove('open');
+			} else {
+				itemChange.forEach(function (el) {
+					if (el.classList.contains('active')) {
+						el.classList.remove('active');
+						el.nextElementSibling.classList.remove('open');
+					}
+				});
+				el.classList.add('active');
+				el.nextElementSibling.classList.add('open');
+			}
+		});
+	}
+
+	itemChange.forEach(function (el) {
+		openMenu(el);
+	});
 
 	/*********Прячем выпадающую подсказку с сайтами при потере фокуса с поля поиска**************/
 	fieldSearch.addEventListener('blur', function () {
@@ -310,23 +359,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	blockItems.addEventListener('click', function (e) {
 		let target = e.target;
-		if (target.className === 'section-elem') {
-			/********Делаем открытие подменю************/
-
-			if (target.firstChild.classList.contains('active')) {
-				target.firstChild.classList.remove('active');
-				target.firstChild.nextElementSibling.classList.remove('open');
-			} else {
-				itemChange.forEach(function (el) {
-					if (el.classList.contains('active')) {
-						el.classList.remove('active');
-						el.nextElementSibling.classList.remove('open');
-					}
-				});
-				target.classList.add('active');
-				target.nextElementSibling.classList.add('open');
-			}
-		}
 
 		if (target.className === 'subitem-element') {
 			if (document.querySelector('.add-block')) {

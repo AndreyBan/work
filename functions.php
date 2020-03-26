@@ -61,7 +61,7 @@ function view_cat($arr, $pid = 0)
 		for ($i = 0; $i < count($arr[$pid]); $i++) {
 			if ($modEdit) {
 
-				echo '<li class="section-elem"><div class="items__elem"> <input type="text" class="input-site" data-id="' . $arr[$pid][$i]["ID"] . '" value="'
+				echo '<li><div class="items__elem"> <input type="text" class="input-site" data-id="' . $arr[$pid][$i]["ID"] . '" value="'
 					. $arr[$pid][$i]["NAME"] . '" />'
 					. '<span>
                                     <i class="ico-arrow">
