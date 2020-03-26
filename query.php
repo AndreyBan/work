@@ -5,6 +5,19 @@ $mysqli->set_charset('utf8');
 if ($mysqli->connect_error) {
 	die('Ошибка подключения(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
 }
+function getQueryForDelete($name, $attr, $arr, $mysqli){
+	$str = $name .'.'.$attr.' IN';
+	$total = count($arr);
+	$counter = 0;
+	foreach ($arr as $i => $item) {
+		$counter++;
+		if ($counter == 1) $str = $str . " (" . $item . ",";
+		elseif ($counter !== $total) $str = $str . $item . ",";
+		if ($counter == $total) $str = $str . $item . ")";
+	}
+	$sqlUpdate = "DELETE FROM `$name` WHERE $str";
+	$mysqli->query($sqlUpdate);
+}
 
 function deleteSites($mysqli)
 {
@@ -24,21 +37,7 @@ function deleteSites($mysqli)
 		$arValueData[] = $arItem["id_type"];
 	}
 	$arRes = array_diff($arValueType, $arValueData);
-	$str = '`type`.id_type IN';
-	$counter = 0;
-	$total = count($arRes);
-	foreach ($arRes as $i => $item) {
-		$counter++;
-		if ($counter == 1) $str = $str . " (" . $item . ",";
-		elseif ($counter !== $total) $str = $str . $item . ",";
-		if ($counter == $total) $str = $str . $item . ")";
-	}
-	$sqlUpdate = "DELETE FROM `type` WHERE $str";
-	if ($mysqli->query($sqlUpdate) === TRUE) {
-		echo "Record updated successfully";
-	} else {
-		echo "Error updating record: " . $mysqli->error;
-	}
+	getQueryForDelete('type', 'id_type', $arRes, $mysqli);
 }
 
 
@@ -171,6 +170,23 @@ if (!empty($_POST['JSON'])) {
 			$sql = "DELETE FROM `sites` WHERE `sites`.ID = $inputId";
 			$mysqli->query($sql);
 			deleteSites($mysqli);
+			break;
+
+		case "removeSection":
+			$sql = "SELECT `sites`.ID FROM `sites` WHERE `sites`.PID = $inputId";
+			$result = $mysqli->query($sql);
+			$arResId = $result->fetch_all(MYSQLI_ASSOC);
+			$arrRes = [];
+
+			foreach ($arResId as $value){
+				$arrRes[] = $value["ID"];
+			}
+			getQueryForDelete('data', 'ID', $arrRes, $mysqli);
+
+			deleteSites($mysqli);
+			$sql2 = "DELETE FROM `sites` WHERE `sites`.PID = $inputId OR `sites`.ID = $inputId";
+			$mysqli->query($sql2);
+			$mysqli->close();
 			break;
 
 		case "addSection":

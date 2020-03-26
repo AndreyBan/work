@@ -63,13 +63,13 @@ function view_cat($arr, $pid = 0)
 
 				echo '<li><div class="items__elem"> <input type="text" class="input-site" data-id="' . $arr[$pid][$i]["ID"] . '" value="'
 					. $arr[$pid][$i]["NAME"] . '" />'
-					. '<span>
+					. '<span class="arrow">
                                     <i class="ico-arrow">
                                         <svg width="12" height="12">
                                             <use xlink:href="/img/map.svg#arrow-down"/>
                                         </svg>
                                     </i>
-                                </span>
+                                </span><span class="delete-icon delete-icon-section"></span>
                             </div>';
 				view_cat($arr, $arr[$pid][$i]["ID"]);
 				echo '</li>';

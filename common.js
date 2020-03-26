@@ -20,20 +20,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		new ClipboardJS('.results__value'); //Покдлючаем копирование по полю с паролем
 	}
 	if (modeEdit) {
-		let observer = new MutationObserver(() => {
-			let itemChange = document.querySelectorAll('.items__elem');
-
-			itemChange.forEach(function (el) {
-				openMenu(el);
-			});
-		});
-		observer.observe(blockItems, {
-			childList: true
-		});
-
 		function getStrAddSite(id) {
-			let strAddSite = '<ul class="subitem" data-id="' + id + '"><li class="btn-add-site">Добавить сайт <span class="add-site">+</span></li></ul>';
-			return strAddSite;
+			return '<ul class="subitem" data-id="' + id + '"><li class="btn-add-site">Добавить сайт <span class="add-site">+</span></li></ul>';
 		}
 
 		blockItemsLi.forEach(function (el) {
@@ -44,30 +32,57 @@ document.addEventListener('DOMContentLoaded', function () {
 				el.insertAdjacentHTML('beforeend', str);
 			}
 		});
-	}
 
-	/***********Открыть/закрыть подменю*********/
-	function openMenu(el) {
-		el.addEventListener('click', function () {
-			if (el.classList.contains('active')) {
-				el.classList.remove('active');
-				el.nextElementSibling.classList.remove('open');
-			} else {
+
+		blockItems.addEventListener('click', function (e) {
+			let target = e.target;
+			if (target.className === 'items__elem') {
 				itemChange.forEach(function (el) {
 					if (el.classList.contains('active')) {
 						el.classList.remove('active');
 						el.nextElementSibling.classList.remove('open');
 					}
 				});
-				el.classList.add('active');
-				el.nextElementSibling.classList.add('open');
+				target.classList.add('active');
+				target.nextElementSibling.classList.add('open');
+
+			}
+			else if(target.className === 'items__elem active'){
+				target.classList.remove('active');
+				target.nextElementSibling.classList.remove('open');
 			}
 		});
 	}
+	else {
+		/***********Открыть/закрыть подменю*********/
+		function openMenu(el) {
+			el.addEventListener('click', function (e) {
+				let target = e.target;
 
-	itemChange.forEach(function (el) {
-		openMenu(el);
-	});
+				if (target.className !== 'delete-icon delete-icon-section') {
+					if (el.classList.contains('active')) {
+						el.classList.remove('active');
+						el.nextElementSibling.classList.remove('open');
+					} else {
+						itemChange.forEach(function (el) {
+							if (el.classList.contains('active')) {
+								el.classList.remove('active');
+								el.nextElementSibling.classList.remove('open');
+							}
+						});
+						el.classList.add('active');
+						el.nextElementSibling.classList.add('open');
+					}
+				}
+			});
+		}
+		document.querySelectorAll('.items__elem').forEach(function (el) {
+			openMenu(el);
+		});
+	}
+
+
+
 
 	/*********Прячем выпадающую подсказку с сайтами при потере фокуса с поля поиска**************/
 	fieldSearch.addEventListener('blur', function () {
@@ -420,13 +435,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	/********************Добавление раздела********************/
 	function addSection(id, name) {
 		let section = document.querySelector('.items'),
-			str = '<li > <div class="items__elem"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span>' +
+			str = '<li> <div class="items__elem"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span class="arrow">' +
 				'<i class="ico-arrow">' +
 				'<svg width="12" height="12">' +
 				'<use xlink:href="/img/map.svg#arrow-down"></use>' +
 				'</svg>' +
 				'</i>' +
-				'</span>' +
+				'</span><span class="delete-icon delete-icon-section"></span>' +
 				'</div>' +
 
 				'<ul class="subitem" data-id="' + id + '">' +
@@ -448,6 +463,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	/********************удаление сайта********************/
 	function removeSite(id) {
 		document.getElementById(id).remove();
+		subitemChange[0].click();
+	}
+
+	function removeSection(id) {
+		document.querySelector('.input-site[data-id="' + id + '"]').closest('li').remove();
 		subitemChange[0].click();
 	}
 
@@ -532,6 +552,12 @@ document.addEventListener('DOMContentLoaded', function () {
 					arData.id_input = target.previousElementSibling.getAttribute('data-id');
 					removeInput('JSON=' + JSON.stringify(arData));
 					removeSite(arData.id_input);
+					break;
+				case "delete-icon delete-icon-section":
+					arData.action = 'removeSection';
+					arData.id_input = target.previousElementSibling.previousElementSibling.getAttribute('data-id');
+					removeInput('JSON=' + JSON.stringify(arData));
+					removeSection(arData.id_input);
 					break;
 				case "add-section":
 					arData.action = 'addSection';

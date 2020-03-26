@@ -106,6 +106,15 @@ header h1 {
 .side-bar__block ul li {
     list-style: none;
 }
+.items > li .delete-icon{
+    left: 24px;
+}
+.items__elem:hover .delete-icon:before,
+.items__elem:hover .delete-icon:after,
+.items__elem.active .delete-icon:before,
+.items__elem.active .delete-icon:after{
+    background-color: #fff;
+}
 .side-bar__block .items__elem input{
     background-color: transparent;
     border: none;
@@ -209,7 +218,9 @@ header h1 {
 .ico-arrow > svg {
     transition: .3s;
 }
-
+.arrow{
+    pointer-events: none;
+}
 .items__elem.active .ico-arrow > svg {
     transition: .3s;
     transform: rotate(180deg);
