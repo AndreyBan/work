@@ -40,9 +40,10 @@ header h1 {
 .container {
     position: relative;
     width: 780px;
-    margin: 0 auto;
+    margin: 0 auto 24px;
     display: flex;
     justify-content: space-between;
+
 }
 
 .ico-key {
@@ -50,7 +51,65 @@ header h1 {
     width: 42px;
     height: 42px;
 }
+.ico-settings {
+    width: 30px;
+    height: 30px;
+    fill: #ffffff;
+    cursor: pointer;
+}
 
+.settings-wrap{
+    position: absolute;
+    right: 68px;
+    top: 24px;
+    cursor: pointer;
+}
+.menu{
+    list-style: none;
+    background-color: #ffffff;
+    position: absolute;
+    right: 36px;
+    top: 0;
+    border-radius: 4px;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: ease-in-out .15s;
+}
+
+#menu:checked + .menu{
+    opacity: 1;
+    pointer-events: auto;
+    transition: ease-in-out .15s;
+}
+.menu li{
+    padding: 8px 32px;
+    cursor: pointer;
+    position: relative;
+}
+.menu li:hover{
+    background-color: rgba(86, 154, 255, 0.11);
+}
+.menu li a{
+    text-decoration: none;
+    color: #5A6BFF;
+    white-space: nowrap;
+}
+.menu li:before{
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    opacity: 0;
+    background-color: rgba(86, 154, 255, .7);
+}
+.menu li:hover:before{
+    transition: .1s;
+    opacity: 1;
+
+}
 .contents {
     margin-top: 48px;
 }
@@ -465,7 +524,7 @@ header h1 {
     width: 294px;
     padding: 32px 28px;
     color: #1b1b1b;
-    right: 30vw;
+    height: max-content;
 }
 
 .results__block .title {

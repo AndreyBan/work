@@ -27,6 +27,26 @@ $path = '';
 				<use xlink:href="<?php echo $path . '/img/map.svg#key' ?>"/>
 			</svg>
 		</i>
+
+	</div>
+	<div class="settings-wrap">
+		<label for="menu">
+	<i class="ico-settings">
+		<svg width="30" height="30">
+			<use xlink:href="<?php echo $path . '/img/map.svg#settings' ?>"/>
+		</svg>
+	</i>
+		</label>
+		<input type="checkbox" id="menu" hidden>
+	<ul class="menu">
+		<li>
+			<?php if(!$modEdit){?>
+			<a href="?admin">Режим редактирования</a>
+			<?php } else{?>
+				<a href="/">Выйти из редактирования</a>
+			<?php } ?>
+		</li>
+	</ul>
 	</div>
 </header>
 
@@ -46,6 +66,9 @@ $path = '';
 		</div>
 		<div class="results__block">
 			<a class="title" href="https://agat-group.com" target="_blank">agat-group.com</a>
+			<?php if($modEdit) {?>
+				<div> <span>Ссылка: </span><input class="input-link" type="text" value="" data-id="" data-name="LINK"></div>
+			<?php } ?>
 			<div class="copyed__block">
 				<?= $modEdit ? "Сохранено" : "Скопировано" ?>
 			</div>

@@ -89,14 +89,15 @@ if (!empty($_POST['JSON'])) {
 	switch ($action) {
 
 		case "save":
-			if ($inputName !== 'TYPE') {
-				$sqlUpdate = "UPDATE `data` SET `data`.$inputName = '$inputValue' WHERE `data`.id_data = $inputId";
-			} else $sqlUpdate = "UPDATE `type` SET `type`.TYPE_NAME = '$inputValue' WHERE `type`.id_type = $inputId";
-			if ($mysqli->query($sqlUpdate) === TRUE) {
-				echo "Record updated successfully";
-			} else {
-				echo "Error updating record: " . $mysqli->error;
+			if ($inputName == 'TYPE') {
+				$sqlUpdate = "UPDATE `type` SET `type`.TYPE_NAME = '$inputValue' WHERE `type`.id_type = $inputId";
+
 			}
+			elseif ($inputName == 'LINK'){
+				$sqlUpdate = "UPDATE `sites` SET `sites`.LINK = '$inputValue' WHERE `sites`.ID = $inputId";
+			}
+			else $sqlUpdate = "UPDATE `data` SET `data`.$inputName = '$inputValue' WHERE `data`.id_data = $inputId";
+			$mysqli->query($sqlUpdate);
 			break;
 
 		case "add":

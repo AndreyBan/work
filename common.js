@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		new ClipboardJS('.copy-icon'); //Покдлючаем копирование по кнопке
 		new ClipboardJS('.results__value'); //Покдлючаем копирование по полю с паролем
 	}
-	if (modeEdit) {
+	if (modeEdit()) {
 		function getStrAddSite(id) {
 			return '<ul class="subitem" data-id="' + id + '"><li class="btn-add-site">Добавить сайт <span class="add-site">+</span></li></ul>';
 		}
@@ -46,14 +46,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				target.classList.add('active');
 				target.nextElementSibling.classList.add('open');
 
-			}
-			else if(target.className === 'items__elem active'){
+			} else if (target.className === 'items__elem active') {
 				target.classList.remove('active');
 				target.nextElementSibling.classList.remove('open');
 			}
 		});
-	}
-	else {
+	} else {
 		/***********Открыть/закрыть подменю*********/
 		function openMenu(el) {
 			el.addEventListener('click', function (e) {
@@ -76,12 +74,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			});
 		}
+
 		document.querySelectorAll('.items__elem').forEach(function (el) {
 			openMenu(el);
 		});
 	}
-
-
 
 
 	/*********Прячем выпадающую подсказку с сайтами при потере фокуса с поля поиска**************/
@@ -331,7 +328,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 	/************Вывод результатов************/
+
 	function outputResults(elem) {
+		let valueTitle = document.querySelector('a.title');
+		if (modeEdit()) {
+			let inputLink = document.querySelector('.input-link');
+			inputLink.value = elem["ONE"][0].LINK;
+			inputLink.setAttribute('data-id', elem["ONE"][0].ID);
+		}
 		valueTitle.innerText = elem["ONE"][0].NAME;
 		valueTitle.setAttribute('href', elem["ONE"][0].LINK);
 		valueTitle.setAttribute('data-id', elem["ONE"][0].ID);
@@ -346,7 +350,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	let valueTitle = document.querySelector('a.title');
 
 	function sendData(data) {
 
@@ -362,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			.then(elem => {
 				if (elem['ONE'].length) {
 					outputResults(elem);
-				} else valueTitle.innerText = 'Нет данных';
+				}
 
 				if (modeEdit()) {
 					addFieldValue();
@@ -492,7 +495,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (target.className === 'delete-icon') {
 				arData.id_input = target.parentElement.getAttribute('data-id');
 				arData.action = 'remove';
-				removeInput('JSON=' + JSON.stringify(arData));
+				changeInput('JSON=' + JSON.stringify(arData));
 				let parentBlock = target.closest('.results__field');
 				if (parentBlock.closest('.block__value').childElementCount === 3) parentBlock.closest('.block__value').remove();
 				else parentBlock.remove();
@@ -513,13 +516,18 @@ document.addEventListener('DOMContentLoaded', function () {
 				arData.action = 'save';
 				arData.id_input = target.getAttribute('data-id');
 				arData.value = target.value;
-				arData.type = target.closest('.block__value').getAttribute('data-name');
 				arData.name = target.getAttribute('data-name');
+				if (arData.name !== 'LINK') {
+					arData.type = target.closest('.block__value').getAttribute('data-name');
+				}
+				else{
+					document.querySelector('.results__block .title').setAttribute('href', arData.value);
+				}
 				if (target.classList.contains('subtitle')) {
 					target.closest('.block__value').setAttribute('data-name', target.value);
 				}
 				target.setAttribute('value', target.value);
-				saveInput('JSON=' + JSON.stringify(arData));
+				changeInput('JSON=' + JSON.stringify(arData));
 			}
 		};
 
@@ -533,7 +541,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				arData.action = 'saveGroup';
 				arData.value = target.value;
 				arData.id_input = target.getAttribute('data-id');
-				saveInput('JSON=' + JSON.stringify(arData));
+				changeInput('JSON=' + JSON.stringify(arData));
+				let title = document.querySelector('.results__block .title');
+				title.textContent = arData.value;
 			}
 		});
 		/***************Действия над сайтами**********************/
@@ -550,13 +560,13 @@ document.addEventListener('DOMContentLoaded', function () {
 				case "delete-icon":
 					arData.action = 'removeSite';
 					arData.id_input = target.previousElementSibling.getAttribute('data-id');
-					removeInput('JSON=' + JSON.stringify(arData));
+					changeInput('JSON=' + JSON.stringify(arData));
 					removeSite(arData.id_input);
 					break;
 				case "delete-icon delete-icon-section":
 					arData.action = 'removeSection';
 					arData.id_input = target.previousElementSibling.previousElementSibling.getAttribute('data-id');
-					removeInput('JSON=' + JSON.stringify(arData));
+					changeInput('JSON=' + JSON.stringify(arData));
 					removeSection(arData.id_input);
 					break;
 				case "add-section":
@@ -570,22 +580,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 
-	function saveInput(data, id = '') {
-		fetch(url, {
-			cache: "no-cache",
-			method: 'POST',
-			headers: {'Content-type': 'application/x-www-form-urlencoded'},
-			body: data
-		}).then(successResponse => {
-
-			if (successResponse.status !== 200) {
-				alert(successResponse.status + ': ' + successResponse.statusText);
-			}
-		})
-			.catch(error => alert(error));
-	}
-
-	function removeInput(data) {
+	function changeInput(data) {
 		fetch(url, {
 			cache: "no-cache",
 			method: 'POST',
@@ -593,4 +588,5 @@ document.addEventListener('DOMContentLoaded', function () {
 			body: data
 		}).catch(error => alert(error));
 	}
+
 });
