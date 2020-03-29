@@ -397,8 +397,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			sendData(bodytext);
 		}
 	});
-
-	subitemChange[0].click();
+if(subitemChange[0]) subitemChange[0].click();
 
 	function updateInput(data) {
 		fetch(url, {

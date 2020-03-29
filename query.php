@@ -204,5 +204,3 @@ if (!empty($_POST['JSON'])) {
 			break;
 	}
 }
-
-
