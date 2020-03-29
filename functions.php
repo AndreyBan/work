@@ -2,7 +2,7 @@
 define('HOST', 'localhost');
 define('USER', 'root');
 define('PASS', '');
-define('DB', 'agat');
+define('DB', 'agatpasswords');
 
 function call_db($host, $user, $pass, $database)
 {

@@ -65,7 +65,7 @@ $path = '';
 			<?php } ?>
 		</div>
 		<div class="results__block">
-			<a class="title" href="https://agat-group.com" target="_blank">agat-group.com</a>
+			<a class="title" href="" target="_blank">Нет данных</a>
 			<?php if($modEdit) {?>
 				<div> <span>Ссылка: </span><input class="input-link" type="text" value="" data-id="" data-name="LINK"></div>
 			<?php } ?>
