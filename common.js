@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let url = 'query.php',
         itemChange = document.querySelectorAll('.items__elem'),
-        blockItems = document.querySelector('.items'),
+        blockItems = document.querySelector('.items-wrap'),
         blockItemsLi = document.querySelectorAll('.items>li'),
         subitemChange = document.querySelectorAll('.subitem li:not(.btn-add-site)'),
         fieldSearch = document.querySelector('.search'),
@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        if (blockItems) {
             blockItems.addEventListener('click', function (e) {
                 let target = e.target;
                 if (target.className === 'items__elem') {
@@ -51,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     target.nextElementSibling.classList.remove('open');
                 }
             });
-        }
     } else {
         /***********Открыть/закрыть подменю*********/
         function openMenu(el) {
@@ -375,30 +373,29 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => alert(error));
     }
-	if (blockItems) {
-		blockItems.addEventListener('click', function (e) {
-			let target = e.target;
 
-			if (target.className === 'subitem-element') {
-				if (document.querySelector('.add-block')) {
-					document.querySelector('.add-block').remove();
-				}
-				let subitemId = target.id,
-					bodytext = "ID=" + subitemId;
+        blockItems.addEventListener('click', function (e) {
+            let target = e.target;
 
-				fieldSearch.value = '';
-				if (!target.classList.contains('change')) {
-					subitemChange.forEach(function (el) {
-						if (el.classList.contains('change')) {
-							el.classList.remove('change');
-						}
-					});
-					target.classList.add('change');
-				}
-				sendData(bodytext);
-			}
-		});
-	}
+            if (target.className === 'subitem-element') {
+                if (document.querySelector('.add-block')) {
+                    document.querySelector('.add-block').remove();
+                }
+                let subitemId = target.id,
+                    bodytext = "ID=" + subitemId;
+
+                fieldSearch.value = '';
+                if (!target.classList.contains('change')) {
+                    document.querySelectorAll('.subitem li:not(.btn-add-site)').forEach(function (el) {
+                        if (el.classList.contains('change')) {
+                            el.classList.remove('change');
+                        }
+                    });
+                    target.classList.add('change');
+                }
+                sendData(bodytext);
+            }
+        });
     if (subitemChange[0]) subitemChange[0].click();
 
     function updateInput(data) {
@@ -438,8 +435,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /********************Добавление раздела********************/
     function addSection(id, name) {
-        let section = document.querySelector('.items'),
-            str = '<li> <div class="items__elem"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span class="arrow">' +
+        let section = document.querySelector('.items');
+        if (section) {
+
+            let str = '<li> <div class="items__elem"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span class="arrow">' +
                 '<i class="ico-arrow">' +
                 '<svg width="12" height="12">' +
                 '<use xlink:href="/img/map.svg#arrow-down"></use>' +
@@ -452,12 +451,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 '<li class="btn-add-site">Добавить сайт <span class="add-site">+</span></li>' +
                 '</ul>' +
                 '</li>';
-	if(section) {
-		section.insertAdjacentHTML('beforeend', str);
-	}
-	else {
-		document.querySelector('.add-section').insertAdjacentHTML('beforebegin', str);
-	}
+
+            section.insertAdjacentHTML('beforeend', str);
+        } else {
+            let str = '<ul class="items"><li> <div class="items__elem"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span class="arrow">' +
+                '<i class="ico-arrow">' +
+                '<svg width="12" height="12">' +
+                '<use xlink:href="/img/map.svg#arrow-down"></use>' +
+                '</svg>' +
+                '</i>' +
+                '</span><span class="delete-icon delete-icon-section"></span>' +
+                '</div>' +
+                '<ul class="subitem" data-id="' + id + '">' +
+                '<li class="btn-add-site">Добавить сайт <span class="add-site">+</span></li>' +
+                '</ul>' +
+                '</li></ul>';
+            document.querySelector('.add-section').insertAdjacentHTML('beforebegin', str);
+        }
     }
 
     /********************Добавление сайта********************/
@@ -471,12 +481,15 @@ document.addEventListener('DOMContentLoaded', function () {
     /********************удаление сайта********************/
     function removeSite(id) {
         document.getElementById(id).remove();
-        subitemChange[0].click();
+        if (!document.querySelector('.subitem-element')) document.querySelector('.title').innerHTML = 'Нет данных';
+        if(subitemChange[0]) subitemChange[0].click();
     }
 
     function removeSection(id) {
         document.querySelector('.input-site[data-id="' + id + '"]').closest('li').remove();
-        subitemChange[0].click();
+        if (!document.querySelector('.subitem-element')) document.querySelector('.title').innerHTML = 'Нет данных';
+
+       if(subitemChange[0]) subitemChange[0].click();
     }
 
     /*****************Сохранение/добавление полей*******************/

@@ -59,11 +59,14 @@ $path = '';
 				<ul class="prompt__list">
 				</ul>
 			</div>
+            <div class="items-wrap">
 			<?php view_cat($arrSort); ?>
+
 			<?php if($modEdit){?>
 			<div class="add-section">Добавить раздел</div>
 			<?php } ?>
-		</div>
+            </div>
+        </div>
 		<div class="results__block">
 			<a class="title" href="" target="_blank">Нет данных</a>
 			<?php if($modEdit) {?>
