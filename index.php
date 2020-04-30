@@ -16,6 +16,22 @@ $path = '';
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<link rel="stylesheet" href="css/style.css?v=<?php echo time() ?>">
 	<title>Менеджер паролей</title>
+    <?php if($modEdit){ ?>
+    <style>
+        .subitem-element{
+            position: relative;
+        }
+        .subitem-element:before{
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 10px;
+            margin-left: -10px;
+            background: url("../img/arrow-down-angle.svg") 0 50% no-repeat;
+            background-size: 16px;
+        }
+    </style>
+    <?php } ?>
 </head>
 
 <body>

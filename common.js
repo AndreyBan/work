@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function createField(elId, type, fieldName, fieldVal, typeId) {
         if (!modeEdit()) {
             let str = '<div class="results__field" data-id="' + elId + '">\n' +
-                '<span class="name">' + fieldName + ':' + '</span>\n' +
+                '<span class="name" title="'+ fieldName +'">' + fieldName + ':' + '</span>\n' +
                 '    <input type="text" class="results__value" data-clipboard-action="copy" id="field-' + elId + '" data-clipboard-target="#field-' + elId + '"\n' +
                 '    data-id="' + elId + '" value="' + fieldVal + '"/>\n' +
                 '    <span class="copy-icon" data-clipboard-action="copy" data-clipboard-target="#field-' + elId + '">\n' +

@@ -3,24 +3,21 @@ $nameDB = 'agatpasswords';
 define('HOST', 'localhost');
 define('USER', 'root');
 define('PASS', 'root');
-
 define('DB', $nameDB);
+
 $mysqlnew = new mysqli(HOST, USER, PASS);
 $sql = " CREATE  DATABASE IF NOT EXISTS $nameDB";
-if($mysqlnew->query($sql) == true){
-	$mysqlnew->close();
-	$mysqlnew = new mysqli(HOST, USER, PASS, DB);
-	$mysqlnew->set_charset('utf8');
-	$sql = "CREATE TABLE `data` (`id_data` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `VALUE` VARCHAR(30) NULL, `ID` INT(255) UNSIGNED NULL,`id_type`  INT(255) UNSIGNED NULL, `FIELD` VARCHAR(60) NULL); 
-CREATE TABLE `fields`(`id_field` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `FIELD` VARCHAR(60)  NULL); 
-CREATE TABLE `sites`(`ID` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,`PID` INT(255) UNSIGNED NULL DEFAULT 0, `NAME` VARCHAR(60) NULL, `LINK` CHAR(200) NULL); 
-CREATE TABLE `type`(`id_type` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,`TYPE_NAME` CHAR(60) NULL DEFAULT 0);
-ALTER TABLE `data` ADD FOREIGN KEY (`ID`) REFERENCES `sites`(`ID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
-ALTER TABLE `data` ADD FOREIGN KEY (`id_type`) REFERENCES `type`(`id_type`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
-	$mysqlnew->multi_query($sql);
-	$mysqlnew->close();
-}
-
+$mysqlnew->query($sql);
+$mysqlnew = new mysqli(HOST, USER, PASS, DB);
+$mysqlnew->set_charset('utf8');
+$sql = "CREATE TABLE IF NOT EXISTS `data` (`id_data` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `VALUE` VARCHAR(30) NULL, `ID` INT(255) UNSIGNED NULL,`id_type`  INT(255) UNSIGNED NULL, `FIELD` VARCHAR(60) NULL); 
+CREATE TABLE IF NOT EXISTS `fields`(`id_field` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `FIELD` VARCHAR(60)  NULL); 
+CREATE TABLE IF NOT EXISTS `sites`(`ID` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,`PID` INT(255) UNSIGNED NULL DEFAULT 0, `NAME` VARCHAR(60) NULL, `LINK` CHAR(200) NULL); 
+CREATE TABLE IF NOT EXISTS `type`(`id_type` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,`TYPE_NAME` CHAR(60) NULL DEFAULT 0);
+ALTER TABLE IF NOT EXISTS `data` ADD FOREIGN KEY (`ID`) REFERENCES `sites`(`ID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE IF NOT EXISTS `data` ADD FOREIGN KEY (`id_type`) REFERENCES `type`(`id_type`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
+$mysqlnew->multi_query($sql);
+$mysqlnew->close();
 
 
 function call_db($host, $user, $pass, $database)
