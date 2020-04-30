@@ -17,6 +17,7 @@ function getQueryForDelete($name, $attr, $arr, $mysqli){
 	}
 	$sqlUpdate = "DELETE FROM `$name` WHERE $str";
 	$mysqli->query($sqlUpdate);
+	$mysqli->close();
 }
 
 function deleteSites($mysqli)
@@ -38,6 +39,7 @@ function deleteSites($mysqli)
 	}
 	$arRes = array_diff($arValueType, $arValueData);
 	getQueryForDelete('type', 'id_type', $arRes, $mysqli);
+	$mysqli->close();
 }
 
 
@@ -63,12 +65,14 @@ if (!empty($_POST['ID']) && empty($_POST['JSON'])) {
  INNER JOIN `type` ON `data`.id_type = `type`.id_type WHERE `sites`.ID = $id";
 	$result = $mysqli->query($sql);
 	$arrRes["TWO"] = $result->fetch_all(MYSQLI_ASSOC);
+	$mysqli->close();
 	$arrRes = json_encode($arrRes, true);
 	echo $arrRes;
 } else if (empty($_POST['JSON'])) {
 	$sql = "SELECT * FROM `sites` WHERE PID>0";
 	$result = $mysqli->query($sql);
 	$arrRes = $result->fetch_all(MYSQLI_ASSOC);
+	$mysqli->close();
 	$arrRes = json_encode($arrRes, true);
 	echo $arrRes;
 }
@@ -98,6 +102,7 @@ if (!empty($_POST['JSON'])) {
 			}
 			else $sqlUpdate = "UPDATE `data` SET `data`.$inputName = '$inputValue' WHERE `data`.id_data = $inputId";
 			$mysqli->query($sqlUpdate);
+			$mysqli->close();
 			break;
 
 		case "add":
@@ -123,6 +128,7 @@ if (!empty($_POST['JSON'])) {
 			$sqlUpdate = "DELETE FROM `data` WHERE `data`.id_data = $inputId";
 			$mysqli->query($sqlUpdate);
 			deleteSites($mysqli);
+			$mysqli->close();
 			break;
 
 		case "createTypeRow":
@@ -150,6 +156,7 @@ if (!empty($_POST['JSON'])) {
 		case "saveGroup":
 			$sqlUpdate = "UPDATE `sites` SET `sites`.NAME = '$inputValue' WHERE `sites`.ID = $inputId";
 			$mysqli->query($sqlUpdate);
+			$mysqli->close();
 			break;
 
 		case "addSite":
@@ -170,6 +177,7 @@ if (!empty($_POST['JSON'])) {
 			$mysqli->query($sqlUpdate);
 			$sql = "DELETE FROM `sites` WHERE `sites`.ID = $inputId";
 			$mysqli->query($sql);
+			$mysqli->close();
 			deleteSites($mysqli);
 			break;
 

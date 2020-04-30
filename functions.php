@@ -1,19 +1,39 @@
 <?php
+$nameDB = 'agatpasswords';
 define('HOST', 'localhost');
 define('USER', 'root');
-define('PASS', '');
-define('DB', 'agatpasswords');
+define('PASS', 'root');
+
+define('DB', $nameDB);
+$mysqlnew = new mysqli(HOST, USER, PASS);
+$sql = " CREATE  DATABASE IF NOT EXISTS $nameDB";
+if($mysqlnew->query($sql) == true){
+	$mysqlnew->close();
+	$mysqlnew = new mysqli(HOST, USER, PASS, DB);
+	$mysqlnew->set_charset('utf8');
+	$sql = "CREATE TABLE `data` (`id_data` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `VALUE` VARCHAR(30) NULL, `ID` INT(255) UNSIGNED NULL,`id_type`  INT(255) UNSIGNED NULL, `FIELD` VARCHAR(60) NULL); 
+CREATE TABLE `fields`(`id_field` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `FIELD` VARCHAR(60)  NULL); 
+CREATE TABLE `sites`(`ID` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,`PID` INT(255) UNSIGNED NULL DEFAULT 0, `NAME` VARCHAR(60) NULL, `LINK` CHAR(200) NULL); 
+CREATE TABLE `type`(`id_type` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,`TYPE_NAME` CHAR(60) NULL DEFAULT 0);
+ALTER TABLE `data` ADD FOREIGN KEY (`ID`) REFERENCES `sites`(`ID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `data` ADD FOREIGN KEY (`id_type`) REFERENCES `type`(`id_type`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
+	$mysqlnew->multi_query($sql);
+	$mysqlnew->close();
+}
+
+
 
 function call_db($host, $user, $pass, $database)
 {
 	$mysqli = new mysqli($host, $user, $pass, $database);
 	$mysqli->set_charset('utf8');
 	if ($mysqli->connect_error) {
-		die('Ошибка подключения(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
+		 die('Ошибка подключения(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
 	}
 	$sql = "SELECT * FROM `sites`";
 	$result = $mysqli->query($sql);
 	$arrRes = $result->fetch_all(MYSQLI_ASSOC);
+	$mysqli->close();
 	return $arrRes;
 }
 
@@ -47,6 +67,7 @@ function getFields($host, $user, $pass, $database)
  INNER JOIN `fields` ON `data`.id_field = `fields`.id_field";
 	$result = $mysqli->query($sql);
 	$arrRes = $result->fetch_all(MYSQLI_ASSOC);
+	$mysqli->close();
 	return $arrRes;
 }
 
@@ -73,8 +94,7 @@ function view_cat($arr, $pid = 0)
                             </div>';
 				view_cat($arr, $arr[$pid][$i]["ID"]);
 				echo '</li>';
-			}
-			else{
+			} else {
 				echo '<li><div class="items__elem">'
 					. $arr[$pid][$i]["NAME"]
 					. '<span>
@@ -90,15 +110,14 @@ function view_cat($arr, $pid = 0)
 			}
 		}
 	} else {
-		echo '<ul class="subitem" data-id="'.$pid.'">';
+		echo '<ul class="subitem" data-id="' . $pid . '">';
 		for ($i = 0; $i < count($arr[$pid]); $i++) {
 			if ($modEdit) {
 				echo '<li class="subitem-element" id="' . $arr[$pid][$i]["ID"]
 					. '"> <input type="text" class="input-site" data-id="' . $arr[$pid][$i]["ID"] . '" value="'
-					. $arr[$pid][$i]["NAME"] .'"/>'
+					. $arr[$pid][$i]["NAME"] . '"/>'
 					. '<span class="delete-icon"></span></li>';
-			}
-			else{
+			} else {
 				echo '<li class="subitem-element" id="' . $arr[$pid][$i]["ID"]
 					. '">'
 					. $arr[$pid][$i]["NAME"]
