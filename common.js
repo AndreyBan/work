@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
         promptBlock = document.querySelector('.prompt'),
         copyedBlock = document.querySelector('.copyed__block'),
         strGET = window.location.search.replace('?', ''),
-        settingMenu =  document.querySelector('.menu'),
+        settingMenu = document.querySelector('.menu'),
         settingWrap = document.querySelector('.settings-wrap');
 
     settingWrap.addEventListener('mouseover', function () {
@@ -24,11 +24,14 @@ document.addEventListener('DOMContentLoaded', function () {
         return strGET === 'admin';
     }
 
-    if (!modeEdit()) {
+    let edit = modeEdit();
+
+    if (!edit) {
         new ClipboardJS('.copy-icon'); //Покдлючаем копирование по кнопке
         new ClipboardJS('.results__value'); //Покдлючаем копирование по полю с паролем
     }
-    if (modeEdit()) {
+
+    if (edit) {
         function getStrAddSite(id) {
             return '<ul class="subitem" data-id="' + id + '"><li class="btn-add-site">Добавить сайт <span class="add-site">+</span></li></ul>';
         }
@@ -44,80 +47,102 @@ document.addEventListener('DOMContentLoaded', function () {
                 el.insertAdjacentHTML('beforeend', str);
             }
         });
+        blockItems.addEventListener('click', e => {
+            let target = e.target;
 
-            blockItems.addEventListener('click', function (e) {
-                let target = e.target;
-                if (target.className === 'items__elem') {
+            if (target.className === 'items__elem') {
+                itemChange.forEach(function (el) {
+                    if (el.classList.contains('active')) {
+                        el.classList.remove('active');
+                        el.nextElementSibling.classList.remove('open');
+                    }
+                });
+                target.classList.add('active');
+                target.nextElementSibling.classList.add('open');
+
+            } else if (target.className === 'items__elem active') {
+                target.classList.remove('active');
+                target.nextElementSibling.classList.remove('open');
+            }
+        });
+    } else {
+        /**
+         * Открыть/закрыть подменю
+         * @param el
+         */
+        function openMenu(el) {
+            eventHandler("click", el, () => {
+                if (el.classList.contains('active')) {
+                    el.classList.remove('active');
+                    el.nextElementSibling.classList.remove('open');
+                } else {
                     itemChange.forEach(function (el) {
                         if (el.classList.contains('active')) {
                             el.classList.remove('active');
                             el.nextElementSibling.classList.remove('open');
                         }
                     });
-                    target.classList.add('active');
-                    target.nextElementSibling.classList.add('open');
-
-                } else if (target.className === 'items__elem active') {
-                    target.classList.remove('active');
-                    target.nextElementSibling.classList.remove('open');
+                    el.classList.add('active');
+                    el.nextElementSibling.classList.add('open');
                 }
-            });
-    } else {
-        /***********Открыть/закрыть подменю*********/
-        function openMenu(el) {
-            el.addEventListener('click', function (e) {
-                let target = e.target;
-
-                if (target.className !== 'delete-icon delete-icon-section') {
-                    if (el.classList.contains('active')) {
-                        el.classList.remove('active');
-                        el.nextElementSibling.classList.remove('open');
-                    } else {
-                        itemChange.forEach(function (el) {
-                            if (el.classList.contains('active')) {
-                                el.classList.remove('active');
-                                el.nextElementSibling.classList.remove('open');
-                            }
-                        });
-                        el.classList.add('active');
-                        el.nextElementSibling.classList.add('open');
-                    }
-                }
-            });
+            })
         }
 
-        document.querySelectorAll('.items__elem').forEach(function (el) {
-            openMenu(el);
-        });
+        document.querySelectorAll('.items__elem').forEach(el => openMenu(el));
     }
 
+    /**
+     * Обработчик кликов для не созданных изначально элементов
+     * @param event тип события
+     * @param elements Элемент или строка из классов
+     * @param callback
+     */
+    function eventHandler(event, elements, callback) {
+        document.addEventListener(event, e => {
+
+            if (typeof elements === "object") {
+                let className = "." + elements.className.replaceAll(' ', '.');
+
+                e.target.matches(className) || e.target.closest(className) ? callback(e) : false;
+            } else {
+                let arrClasses = elements.replaceAll(' ', '').split(',');
+
+                arrClasses.forEach(el => e.target.matches(el) || e.target.closest(el) ? callback(e) : false)
+            }
+        })
+    }
 
     /*********Прячем выпадающую подсказку с сайтами при потере фокуса с поля поиска**************/
-    fieldSearch.addEventListener('blur', function () {
+    fieldSearch.addEventListener('blur', () => {
         setTimeout(function () {
             promptBlock.classList.remove('open');
         }, 200);
     });
 
-    /********* Удаление класса change с подменю при использовнии поиска*************/
+    /**
+     * Удаление класса change с подменю при использовнии поиска
+     */
     function removeChangeSubItem() {
-        subitemChange.forEach(function (item) {
-            if (item.classList.contains('change')) {
-                item.classList.remove('change');
-            }
+        subitemChange.forEach(item => {
+            if (item.classList.contains('change')) item.classList.remove('change');
         });
     }
 
-    /*********Удаляем существующий список сайтов**********/
+    /**
+     * Удаляем существующий список сайтов
+     */
     function removeListPrompt() {
         let promptItem = document.querySelectorAll('.prompt__item');
-        promptItem.forEach(function (item) {
-            item.remove();
-        });
+
+        promptItem.forEach(item => item.remove());
     }
 
+    /**
+     * Реализация выдачи подсказок с сайтами, при использовании поиска
+     * @param elem
+     */
     function outputPrompt(elem) {
-        /**********Реализация выдачи подсказок с сайтами,  при использовании поиска********/
+
         fieldSearch.addEventListener('input', function () {
             let searchValue = this.value,
                 numberPrompt = 0,
@@ -137,11 +162,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     count++;
                 }
             }
+
             let promptItem = document.querySelectorAll('.prompt__item');
+
             //Скрываем блок подсказок если поле пустое или если нет совпадений (подходящих сайтов)
             if (searchValue === '' || !promptItem.length) promptBlock.classList.remove('open');
             else promptBlock.classList.add('open');
-
 
             // Выбор из предложенных результатов  с помощью кнопок up и down
             fieldSearch.addEventListener('keydown', function (e) {
@@ -174,6 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 }
             });
+
             // Удаляем класс выделенной подсказки при навдении мыши
             promptBlock.addEventListener('mouseover', function () {
                 numberPrompt = -1;
@@ -253,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function createField(elId, type, fieldName, fieldVal, typeId) {
         if (!modeEdit()) {
             let str = '<div class="results__field" data-id="' + elId + '">\n' +
-                '<span class="name" title="'+ fieldName +'">' + fieldName + ':' + '</span>\n' +
+                '<span class="name" title="' + fieldName + '">' + fieldName + ':' + '</span>\n' +
                 '    <input type="text" class="results__value" data-clipboard-action="copy" id="field-' + elId + '" data-clipboard-target="#field-' + elId + '"\n' +
                 '    data-id="' + elId + '" value="' + fieldVal + '"/>\n' +
                 '    <span class="copy-icon" data-clipboard-action="copy" data-clipboard-target="#field-' + elId + '">\n' +
@@ -386,28 +413,28 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => alert(error));
     }
 
-        blockItems.addEventListener('click', function (e) {
-            let target = e.target;
+    blockItems.addEventListener('click', function (e) {
+        let target = e.target;
 
-            if (target.className === 'subitem-element') {
-                if (document.querySelector('.add-block')) {
-                    document.querySelector('.add-block').remove();
-                }
-                let subitemId = target.id,
-                    bodytext = "ID=" + subitemId;
-
-                fieldSearch.value = '';
-                if (!target.classList.contains('change')) {
-                    document.querySelectorAll('.subitem li:not(.btn-add-site)').forEach(function (el) {
-                        if (el.classList.contains('change')) {
-                            el.classList.remove('change');
-                        }
-                    });
-                    target.classList.add('change');
-                }
-                sendData(bodytext);
+        if (target.className === 'subitem-element') {
+            if (document.querySelector('.add-block')) {
+                document.querySelector('.add-block').remove();
             }
-        });
+            let subitemId = target.id,
+                bodytext = "ID=" + subitemId;
+
+            fieldSearch.value = '';
+            if (!target.classList.contains('change')) {
+                document.querySelectorAll('.subitem li:not(.btn-add-site)').forEach(function (el) {
+                    if (el.classList.contains('change')) {
+                        el.classList.remove('change');
+                    }
+                });
+                target.classList.add('change');
+            }
+            sendData(bodytext);
+        }
+    });
     if (subitemChange[0]) subitemChange[0].click();
 
     function updateInput(data) {
@@ -494,14 +521,14 @@ document.addEventListener('DOMContentLoaded', function () {
     function removeSite(id) {
         document.getElementById(id).remove();
         if (!document.querySelector('.subitem-element')) document.querySelector('.title').innerHTML = 'Нет данных';
-        if(subitemChange[0]) subitemChange[0].click();
+        if (subitemChange[0]) subitemChange[0].click();
     }
 
     function removeSection(id) {
         document.querySelector('.input-site[data-id="' + id + '"]').closest('li').remove();
         if (!document.querySelector('.subitem-element')) document.querySelector('.title').innerHTML = 'Нет данных';
 
-       if(subitemChange[0]) subitemChange[0].click();
+        if (subitemChange[0]) subitemChange[0].click();
     }
 
     /*****************Сохранение/добавление полей*******************/

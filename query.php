@@ -2,54 +2,75 @@
 include 'functions.php';
 $mysqli = new mysqli(HOST, USER, PASS, DB);
 $mysqli->set_charset('utf8');
+$post = $_POST;
 if ($mysqli->connect_error) {
 	die('Ошибка подключения(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
 }
+
+/**
+ * Составление запроса для удаления поля
+ * @param $name
+ * @param $attr
+ * @param $arr
+ * @param $mysqli
+ */
 function getQueryForDelete($name, $attr, $arr, $mysqli){
 	$str = $name .'.'.$attr.' IN';
 	$total = count($arr);
 	$counter = 0;
-	foreach ($arr as $i => $item) {
+
+	foreach ($arr as $item) {
 		$counter++;
 		if ($counter == 1) $str = $str . " (" . $item . ",";
 		elseif ($counter !== $total) $str = $str . $item . ",";
 		if ($counter == $total) $str = $str . $item . ")";
 	}
+
 	$sqlUpdate = "DELETE FROM `$name` WHERE $str";
 	$mysqli->query($sqlUpdate);
 }
 
+/**
+ * Удаление сайта
+ * @param $mysqli
+ */
 function deleteSites($mysqli)
 {
 	$sql = "SELECT `data`.id_type FROM `data`";
 	$resData = $mysqli->query($sql);
 	$arResData = $resData->fetch_all(MYSQLI_ASSOC);
+
 	$sql = "SELECT `type`.id_type FROM `type`";
 	$resType = $mysqli->query($sql);
 	$arResType = $resType->fetch_all(MYSQLI_ASSOC);
+
 	$arValueType = [];
 	$arValueData = [];
 
 	foreach ($arResType as $arItem) {
 		$arValueType[] = $arItem["id_type"];
 	}
+
 	foreach ($arResData as $arItem) {
 		$arValueData[] = $arItem["id_type"];
 	}
+
 	$arRes = array_diff($arValueType, $arValueData);
 	getQueryForDelete('type', 'id_type', $arRes, $mysqli);
 }
 
 
-if (!empty($_POST['ID']) && empty($_POST['JSON'])) {
-	$id = $_POST['ID'];
+if (!empty($post['ID']) && empty($post['JSON'])) {
+	$id = $post['ID'];
 	$sql = "SELECT
 	 `sites`.NAME,
 	 `sites`.ID,
 	 `sites`.LINK
  FROM `sites` WHERE `sites`.ID = $id";
 	$result = $mysqli->query($sql);
+
 	$arrRes["ONE"] = $result->fetch_all(MYSQLI_ASSOC);
+
 	$sql = "SELECT
 	 `sites`.NAME,
 	 `sites`.ID,
@@ -65,7 +86,7 @@ if (!empty($_POST['ID']) && empty($_POST['JSON'])) {
 	$arrRes["TWO"] = $result->fetch_all(MYSQLI_ASSOC);
 	$arrRes = json_encode($arrRes, true);
 	echo $arrRes;
-} else if (empty($_POST['JSON'])) {
+} else if (empty($post['JSON'])) {
 	$sql = "SELECT * FROM `sites` WHERE PID>0";
 	$result = $mysqli->query($sql);
 	$arrRes = $result->fetch_all(MYSQLI_ASSOC);
@@ -73,14 +94,11 @@ if (!empty($_POST['ID']) && empty($_POST['JSON'])) {
 	echo $arrRes;
 }
 
-if (!empty($_POST['JSON'])) {
+if (!empty($post['JSON'])) {
 
-	$json = json_decode($_POST['JSON']);
-	$action = '';
-	$inputName = '';
-	$inputId = '';
-	$inputValue = '';
-	$inputType = '';
+	$json = json_decode($post['JSON']);
+	$action = $inputName = $inputId = $inputValue = $inputType = null;
+
 	if (!empty($json->action)) $action = $json->action;
 	if (!empty($json->name)) $inputName = $json->name;
 	if (!empty($json->id_input)) $inputId = $json->id_input;
@@ -115,7 +133,6 @@ if (!empty($_POST['JSON'])) {
 			$result = $mysqli->query($sqlUpdate);
 			$arrRes = $result->fetch_all(MYSQLI_ASSOC);
 			$arrRes = json_encode($arrRes, true);
-			$mysqli->close();
 			echo $arrRes;
 			break;
 
@@ -143,7 +160,6 @@ if (!empty($_POST['JSON'])) {
 			$result = $mysqli->query($sqlUpdate);
 			$arrRes = $result->fetch_all(MYSQLI_ASSOC);
 			$arrRes = json_encode($arrRes, true);
-			$mysqli->close();
 			echo $arrRes;
 			break;
 
@@ -161,7 +177,6 @@ if (!empty($_POST['JSON'])) {
 			$result = $mysqli->query($sqlUpdate);
 			$arrRes = $result->fetch_all(MYSQLI_ASSOC);
 			$arrRes = json_encode($arrRes, true);
-			$mysqli->close();
 			echo $arrRes;
 			break;
 
@@ -187,7 +202,6 @@ if (!empty($_POST['JSON'])) {
 			deleteSites($mysqli);
 			$sql2 = "DELETE FROM `sites` WHERE `sites`.PID = $inputId OR `sites`.ID = $inputId";
 			$mysqli->query($sql2);
-			$mysqli->close();
 			break;
 
 		case "addSection":
@@ -199,8 +213,8 @@ if (!empty($_POST['JSON'])) {
 			$result = $mysqli->query($sqlUpdate);
 			$arrRes = $result->fetch_all(MYSQLI_ASSOC);
 			$arrRes = json_encode($arrRes, true);
-			$mysqli->close();
 			echo $arrRes;
 			break;
 	}
+	$mysqli->close();
 }
