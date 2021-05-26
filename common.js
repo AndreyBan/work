@@ -9,7 +9,16 @@ document.addEventListener('DOMContentLoaded', function () {
         promptList = document.querySelector('.prompt__list'),
         promptBlock = document.querySelector('.prompt'),
         copyedBlock = document.querySelector('.copyed__block'),
-        strGET = window.location.search.replace('?', '');
+        strGET = window.location.search.replace('?', ''),
+        settingMenu =  document.querySelector('.menu'),
+        settingWrap = document.querySelector('.settings-wrap');
+
+    settingWrap.addEventListener('mouseover', function () {
+        document.querySelector('.menu').classList.add('show');
+    });
+    settingMenu.addEventListener('mouseout', function () {
+        document.querySelector('.menu').classList.remove('show');
+    });
 
     function modeEdit() {
         return strGET === 'admin';
@@ -24,11 +33,14 @@ document.addEventListener('DOMContentLoaded', function () {
             return '<ul class="subitem" data-id="' + id + '"><li class="btn-add-site">Добавить сайт <span class="add-site">+</span></li></ul>';
         }
 
-        blockItemsLi.forEach(function (el) {
+        blockItemsLi.forEach(el => {
             let classEl = el.lastChild;
+
             if (!classEl.classList.contains('subitem')) {
+
                 let subitemId = el.firstElementChild.firstElementChild.getAttribute("data-id"),
                     str = getStrAddSite(subitemId);
+
                 el.insertAdjacentHTML('beforeend', str);
             }
         });
@@ -241,13 +253,13 @@ document.addEventListener('DOMContentLoaded', function () {
     function createField(elId, type, fieldName, fieldVal, typeId) {
         if (!modeEdit()) {
             let str = '<div class="results__field" data-id="' + elId + '">\n' +
-                '<span class="name">' + fieldName + ':' + '</span>\n' +
+                '<span class="name" title="'+ fieldName +'">' + fieldName + ':' + '</span>\n' +
                 '    <input type="text" class="results__value" data-clipboard-action="copy" id="field-' + elId + '" data-clipboard-target="#field-' + elId + '"\n' +
                 '    data-id="' + elId + '" value="' + fieldVal + '"/>\n' +
                 '    <span class="copy-icon" data-clipboard-action="copy" data-clipboard-target="#field-' + elId + '">\n' +
                 '        <i class="ico-copy">\n' +
                 '        <svg width="18" height="18">\n' +
-                '        <use xlink:href="/img/map.svg#copy"/>\n' +
+                '        <use xlink:href="./img/map.svg#copy"/>\n' +
                 '        </svg>\n' +
                 '        </i>\n' +
                 '        </span>\n' +
@@ -441,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let str = '<li> <div class="items__elem"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span class="arrow">' +
                 '<i class="ico-arrow">' +
                 '<svg width="12" height="12">' +
-                '<use xlink:href="/img/map.svg#arrow-down"></use>' +
+                '<use xlink:href="./img/map.svg#arrow-down"></use>' +
                 '</svg>' +
                 '</i>' +
                 '</span><span class="delete-icon delete-icon-section"></span>' +
@@ -457,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let str = '<ul class="items"><li> <div class="items__elem"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span class="arrow">' +
                 '<i class="ico-arrow">' +
                 '<svg width="12" height="12">' +
-                '<use xlink:href="/img/map.svg#arrow-down"></use>' +
+                '<use xlink:href="./img/map.svg#arrow-down"></use>' +
                 '</svg>' +
                 '</i>' +
                 '</span><span class="delete-icon delete-icon-section"></span>' +

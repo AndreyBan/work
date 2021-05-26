@@ -17,7 +17,6 @@ function getQueryForDelete($name, $attr, $arr, $mysqli){
 	}
 	$sqlUpdate = "DELETE FROM `$name` WHERE $str";
 	$mysqli->query($sqlUpdate);
-	$mysqli->close();
 }
 
 function deleteSites($mysqli)
@@ -39,7 +38,6 @@ function deleteSites($mysqli)
 	}
 	$arRes = array_diff($arValueType, $arValueData);
 	getQueryForDelete('type', 'id_type', $arRes, $mysqli);
-	$mysqli->close();
 }
 
 
@@ -65,14 +63,12 @@ if (!empty($_POST['ID']) && empty($_POST['JSON'])) {
  INNER JOIN `type` ON `data`.id_type = `type`.id_type WHERE `sites`.ID = $id";
 	$result = $mysqli->query($sql);
 	$arrRes["TWO"] = $result->fetch_all(MYSQLI_ASSOC);
-	$mysqli->close();
 	$arrRes = json_encode($arrRes, true);
 	echo $arrRes;
 } else if (empty($_POST['JSON'])) {
 	$sql = "SELECT * FROM `sites` WHERE PID>0";
 	$result = $mysqli->query($sql);
 	$arrRes = $result->fetch_all(MYSQLI_ASSOC);
-	$mysqli->close();
 	$arrRes = json_encode($arrRes, true);
 	echo $arrRes;
 }
@@ -102,12 +98,11 @@ if (!empty($_POST['JSON'])) {
 			}
 			else $sqlUpdate = "UPDATE `data` SET `data`.$inputName = '$inputValue' WHERE `data`.id_data = $inputId";
 			$mysqli->query($sqlUpdate);
-			$mysqli->close();
 			break;
 
 		case "add":
 			$inputSite = $json->site;
-			$mysqli->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
+			$mysqli->autocommit(TRUE);
 			$sqlUpdate = "INSERT INTO `data` (`data`.VALUE, ID, `data`.id_type, FIELD) VALUES ('Значение', $inputSite, $inputId, 'Название')";
 			$mysqli->query($sqlUpdate);
 			$mysqli->commit();
@@ -128,12 +123,11 @@ if (!empty($_POST['JSON'])) {
 			$sqlUpdate = "DELETE FROM `data` WHERE `data`.id_data = $inputId";
 			$mysqli->query($sqlUpdate);
 			deleteSites($mysqli);
-			$mysqli->close();
 			break;
 
 		case "createTypeRow":
 			$inputSite = $json->site;
-			$mysqli->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
+			$mysqli->autocommit(TRUE);
 			$sqlUpdate = "INSERT INTO `type` (`type`.TYPE_NAME) VALUES ('Название')";
 			$mysqli->query($sqlUpdate);
 			$mysqli->commit();
@@ -156,11 +150,10 @@ if (!empty($_POST['JSON'])) {
 		case "saveGroup":
 			$sqlUpdate = "UPDATE `sites` SET `sites`.NAME = '$inputValue' WHERE `sites`.ID = $inputId";
 			$mysqli->query($sqlUpdate);
-			$mysqli->close();
 			break;
 
 		case "addSite":
-			$mysqli->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
+			$mysqli->autocommit(TRUE );
 			$sqlUpdate = "INSERT INTO `sites`  (`sites`.PID, `sites`.NAME ) VALUES ($inputId, 'Новый сайт')";
 			$mysqli->query($sqlUpdate);
 			$mysqli->commit();
@@ -177,7 +170,6 @@ if (!empty($_POST['JSON'])) {
 			$mysqli->query($sqlUpdate);
 			$sql = "DELETE FROM `sites` WHERE `sites`.ID = $inputId";
 			$mysqli->query($sql);
-			$mysqli->close();
 			deleteSites($mysqli);
 			break;
 
@@ -199,8 +191,8 @@ if (!empty($_POST['JSON'])) {
 			break;
 
 		case "addSection":
-			$mysqli->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
-			$sqlUpdate = "INSERT INTO `sites` ( `sites`.NAME ) VALUES ('Новый раздел')";
+			$mysqli->autocommit(TRUE);
+			$sqlUpdate = "INSERT INTO `sites` ( `sites`.NAME) VALUES ('Новый раздел')";
 			$mysqli->query($sqlUpdate);
 			$mysqli->commit();
 			$sqlUpdate = "SELECT `sites`.ID, `sites`.NAME FROM `sites` WHERE  `sites`.ID=LAST_INSERT_ID()";

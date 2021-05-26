@@ -1,25 +1,23 @@
 <?php
-$nameDB = 'agatpasswords';
+$nameDB = 'and_borisov';
 define('HOST', 'localhost');
-define('USER', 'root');
-define('PASS', 'root');
-
+define('USER', 'and_borisov');
+define('PASS', 'Nat07i7xoFhL');
 define('DB', $nameDB);
+
 $mysqlnew = new mysqli(HOST, USER, PASS);
 $sql = " CREATE  DATABASE IF NOT EXISTS $nameDB";
-if($mysqlnew->query($sql) == true){
-	$mysqlnew->close();
-	$mysqlnew = new mysqli(HOST, USER, PASS, DB);
-	$mysqlnew->set_charset('utf8');
-	$sql = "CREATE TABLE `data` (`id_data` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `VALUE` VARCHAR(30) NULL, `ID` INT(255) UNSIGNED NULL,`id_type`  INT(255) UNSIGNED NULL, `FIELD` VARCHAR(60) NULL); 
-CREATE TABLE `fields`(`id_field` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `FIELD` VARCHAR(60)  NULL); 
-CREATE TABLE `sites`(`ID` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,`PID` INT(255) UNSIGNED NULL DEFAULT 0, `NAME` VARCHAR(60) NULL, `LINK` CHAR(200) NULL); 
-CREATE TABLE `type`(`id_type` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,`TYPE_NAME` CHAR(60) NULL DEFAULT 0);
-ALTER TABLE `data` ADD FOREIGN KEY (`ID`) REFERENCES `sites`(`ID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
-ALTER TABLE `data` ADD FOREIGN KEY (`id_type`) REFERENCES `type`(`id_type`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
-	$mysqlnew->multi_query($sql);
-	$mysqlnew->close();
-}
+$mysqlnew->query($sql);
+$mysqlnew = new mysqli(HOST, USER, PASS, DB);
+$mysqlnew->set_charset('utf8');
+$sql = "CREATE TABLE IF NOT EXISTS `data` (`id_data` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `VALUE` VARCHAR(30) NULL, `ID` INT(255) UNSIGNED NULL,`id_type`  INT(255) UNSIGNED NULL, `FIELD` VARCHAR(60) NULL); 
+CREATE TABLE IF NOT EXISTS `fields`(`id_field` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `FIELD` VARCHAR(60)  NULL); 
+CREATE TABLE IF NOT EXISTS `sites`(`ID` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,`PID` INT(255) UNSIGNED NULL DEFAULT 0, `NAME` VARCHAR(60) NULL, `LINK` CHAR(200) NULL); 
+CREATE TABLE IF NOT EXISTS `type`(`id_type` INT(255) UNSIGNED AUTO_INCREMENT PRIMARY KEY,`TYPE_NAME` CHAR(60) NULL DEFAULT 0);
+ALTER TABLE IF NOT EXISTS `data` ADD FOREIGN KEY (`ID`) REFERENCES `sites`(`ID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE IF NOT EXISTS `data` ADD FOREIGN KEY (`id_type`) REFERENCES `type`(`id_type`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
+$mysqlnew->multi_query($sql);
+$mysqlnew->close();
 
 
 
@@ -39,6 +37,12 @@ function call_db($host, $user, $pass, $database)
 
 function getSortArr($array)
 {
+	function cmp($a, $b)
+	{
+		return strcmp($a["NAME"], $b["NAME"]);
+	}
+
+	usort($array, "cmp");
 	$arrCat = array();
 	foreach ($array as $arr) {
 		if (empty($arrCat[$arr['PID']])) {
@@ -46,6 +50,7 @@ function getSortArr($array)
 		}
 		$arrCat[$arr['PID']][] = $arr;
 	}
+
 	return $arrCat;
 }
 
@@ -87,7 +92,7 @@ function view_cat($arr, $pid = 0)
 					. '<span class="arrow">
                                     <i class="ico-arrow">
                                         <svg width="12" height="12">
-                                            <use xlink:href="/img/map.svg#arrow-down"/>
+                                            <use xlink:href="./img/map.svg#arrow-down"/>
                                         </svg>
                                     </i>
                                 </span><span class="delete-icon delete-icon-section"></span>
@@ -100,7 +105,7 @@ function view_cat($arr, $pid = 0)
 					. '<span>
                                     <i class="ico-arrow">
                                         <svg width="12" height="12">
-                                            <use xlink:href="/img/map.svg#arrow-down"/>
+                                            <use xlink:href="./img/map.svg#arrow-down"/>
                                         </svg>
                                     </i>
                                 </span>
