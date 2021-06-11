@@ -1,25 +1,27 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
 
     let url = 'query.php',
         itemChange = document.querySelectorAll('.items__elem'),
-        blockItems = document.querySelector('.items-wrap'),
-        blockItemsLi = document.querySelectorAll('.items>li'),
         subitemChange = document.querySelectorAll('.subitem li:not(.btn-add-site)'),
         fieldSearch = document.querySelector('.search'),
-        promptList = document.querySelector('.prompt__list'),
         promptBlock = document.querySelector('.prompt'),
-        copyedBlock = document.querySelector('.copyed__block'),
-        strGET = window.location.search.replace('?', ''),
-        settingMenu = document.querySelector('.menu'),
+        strGET = location.search.replace('?', '');
+
+    let settingMenu = document.querySelector('.menu'),
         settingWrap = document.querySelector('.settings-wrap');
 
-    settingWrap.addEventListener('mouseover', function () {
-        document.querySelector('.menu').classList.add('show');
-    });
-    settingMenu.addEventListener('mouseout', function () {
-        document.querySelector('.menu').classList.remove('show');
+    settingWrap.addEventListener('mouseover', () => {
+        settingMenu.classList.add('show');
     });
 
+    settingMenu.addEventListener('mouseout', () => {
+        settingMenu.classList.remove('show');
+    });
+
+    /**
+     * Определение режима редактирования
+     * @returns {boolean}
+     */
     function modeEdit() {
         return strGET === 'admin';
     }
@@ -31,102 +33,64 @@ document.addEventListener('DOMContentLoaded', function () {
         new ClipboardJS('.results__value'); //Покдлючаем копирование по полю с паролем
     }
 
-    if (edit) {
-        function getStrAddSite(id) {
-            return '<ul class="subitem" data-id="' + id + '"><li class="btn-add-site">Добавить сайт <span class="add-site">+</span></li></ul>';
-        }
+    /**
+     *
+     * @param id
+     * @returns {string}
+     */
+    function getStrAddSite(id) {
+        return '<ul class="subitem" data-id="' + id + '"><li class="btn-add-site">Добавить сайт <span class="add-site">+</span></li></ul>';
+    }
 
-        blockItemsLi.forEach(el => {
+    if (edit) {
+        let blockItemsLi = document.querySelectorAll('.items>li');
+
+            blockItemsLi.forEach(el => {
             let classEl = el.lastChild;
 
             if (!classEl.classList.contains('subitem')) {
-
                 let subitemId = el.firstElementChild.firstElementChild.getAttribute("data-id"),
                     str = getStrAddSite(subitemId);
 
                 el.insertAdjacentHTML('beforeend', str);
             }
         });
-        blockItems.addEventListener('click', e => {
-            let target = e.target;
+    }
 
-            if (target.className === 'items__elem') {
-                itemChange.forEach(function (el) {
-                    if (el.classList.contains('active')) {
-                        el.classList.remove('active');
-                        el.nextElementSibling.classList.remove('open');
-                    }
-                });
-                target.classList.add('active');
-                target.nextElementSibling.classList.add('open');
+    /**
+     * Открыть/закрыть подменю
+     * @param el
+     */
+    eventHandler("click", ".items__elem", function (e, elem) {
+        if (elem.classList.contains('active')) {
 
-            } else if (target.className === 'items__elem active') {
-                target.classList.remove('active');
-                target.nextElementSibling.classList.remove('open');
-            }
-        });
-    } else {
-        /**
-         * Открыть/закрыть подменю
-         * @param el
-         */
-        function openMenu(el) {
-            eventHandler("click", el, () => {
+            elem.classList.remove('active');
+            elem.nextElementSibling.classList.remove('open');
+
+        } else {
+            itemChange.forEach(el => {
+
                 if (el.classList.contains('active')) {
+
                     el.classList.remove('active');
                     el.nextElementSibling.classList.remove('open');
-                } else {
-                    itemChange.forEach(function (el) {
-                        if (el.classList.contains('active')) {
-                            el.classList.remove('active');
-                            el.nextElementSibling.classList.remove('open');
-                        }
-                    });
-                    el.classList.add('active');
-                    el.nextElementSibling.classList.add('open');
                 }
-            })
+            });
+
+            elem.classList.add('active');
+            elem.nextElementSibling.classList.add('open');
         }
-
-        document.querySelectorAll('.items__elem').forEach(el => openMenu(el));
-    }
+    })
 
     /**
-     * Обработчик кликов для не созданных изначально элементов
-     * @param event тип события
-     * @param elements Элемент или строка из классов
-     * @param callback
+     * Скрываем подсказки при потере фокуса с поля ввода,
+     * сохранив клик по резултатам
      */
-    function eventHandler(event, elements, callback) {
-        document.addEventListener(event, e => {
-
-            if (typeof elements === "object") {
-                let className = "." + elements.className.replaceAll(' ', '.');
-
-                e.target.matches(className) || e.target.closest(className) ? callback(e) : false;
-            } else {
-                let arrClasses = elements.replaceAll(' ', '').split(',');
-
-                arrClasses.forEach(el => e.target.matches(el) || e.target.closest(el) ? callback(e) : false)
-            }
-        })
-    }
-
-    /*********Прячем выпадающую подсказку с сайтами при потере фокуса с поля поиска**************/
-    fieldSearch.addEventListener('blur', () => {
-        setTimeout(function () {
-            promptBlock.classList.remove('open');
-        }, 200);
-    });
-
-    /**
-     * Удаление класса change с подменю при использовнии поиска
-     */
-    function removeChangeSubItem() {
-        subitemChange.forEach(item => {
-            if (item.classList.contains('change')) item.classList.remove('change');
-        });
-    }
+    document.addEventListener("click", e => {
+        if (e.target.className !== "search" || e.target.className !== "prompt__item") {
+            promptBlock.classList.remove('open')
+        }
+    })
 
     /**
      * Удаляем существующий список сайтов
@@ -149,76 +113,137 @@ document.addEventListener('DOMContentLoaded', function () {
                 count = 0;
 
             removeListPrompt();
-
-            //Создаем новый список сайтов
-            for (let key of elem) {
-                let elLi = document.createElement('li');
-
-                if (key.NAME.match(searchValue) && count < 5) { //count ограничивает количество подсказок
-                    elLi.className = 'prompt__item';
-                    elLi.setAttribute('data-id', key.ID);
-                    elLi.innerHTML = key.NAME;
-                    promptList.append(elLi);
-                    count++;
-                }
-            }
+            createListSite(elem, searchValue, count);
 
             let promptItem = document.querySelectorAll('.prompt__item');
 
+            //Подставляем выбранный результат в поле ввода
+            if (promptItem.length) promptItem[0].classList.add('active');
+
             //Скрываем блок подсказок если поле пустое или если нет совпадений (подходящих сайтов)
-            if (searchValue === '' || !promptItem.length) promptBlock.classList.remove('open');
+            if (!searchValue || !promptItem.length) promptBlock.classList.remove('open');
             else promptBlock.classList.add('open');
 
-            // Выбор из предложенных результатов  с помощью кнопок up и down
-            fieldSearch.addEventListener('keydown', function (e) {
+            changeKeyArrow(promptItem, numberPrompt);
+        });
+    }
 
-                let promptItemSelect = document.querySelector('.prompt__item.active');
+    /**
+     * Удаляем класс выделенной подсказки при наведении мыши
+     */
+    eventHandler("mouseover", ".prompt__item", function (e, el) {
+        if (el) el.classList.remove('active');
+    })
 
-                if (e.key === "Enter") {
-                    fieldSearch.value = promptItemSelect.innerText;
-                    promptBlock.classList.remove('open');
-                    removeChangeSubItem();
-                }
-                if (e.code === 'ArrowDown' && numberPrompt + 1 < promptItem.length) {
-                    numberPrompt++;
-                    promptItem.forEach(function (item, i) {
-                        if (i === numberPrompt) {
-                            if (promptItemSelect) {
-                                promptItem[numberPrompt - 1].classList.remove('active');
-                            }
-                            item.classList.add('active');
+    /**
+     * Создаем новый список сайтов
+     */
+    function createListSite(elem, searchValue, count) {
+        let promptList = document.querySelector('.prompt__list');
+
+        for (let key of elem) {
+
+            let elLi = document.createElement('li');
+            const {NAME, ID} = key;
+
+            if (NAME.match(searchValue) && count < 5) { //count ограничивает количество подсказок
+                elLi.className = 'prompt__item';
+                elLi.setAttribute('data-id', ID);
+                elLi.innerHTML = NAME;
+                promptList.append(elLi);
+                count++;
+            }
+        }
+    }
+
+    /**
+     * Обработчик кликов для не созданных изначально элементов
+     * @param event тип события
+     * @param elements Элемент или строка из классов
+     * @param callback
+     */
+    function eventHandler(event, elements, callback) {
+
+        document.addEventListener(event, function (e) {
+
+            if (typeof elements === "object") {
+
+                let className = "." + elements.className.replaceAll(' ', '.');
+                e.target.matches(className) || e.target.closest(className) ? callback(e, e.target) : false;
+
+            } else {
+                let arrClasses = elements.replaceAll(' ', '').split(',');
+
+                arrClasses.forEach(el => {
+                    if (e.target.matches(el)) {
+
+                        callback(e, e.target)
+
+                    } else if (e.target.closest(el)) {
+
+                        callback(e, e.target.closest(el))
+
+                    } else return false;
+                })
+            }
+        })
+    }
+
+    //Выбор результата при клике
+    eventHandler("click", '.prompt__item', (e, el) => {
+        document.getElementById(el.getAttribute('data-id')).click();
+        removeChangeSubItem();
+    })
+
+    /**
+     * Удаление класса change с подменю при использовнии поиска
+     */
+    function removeChangeSubItem() {
+        subitemChange.forEach(item => {
+            if (item.classList.contains('change')) item.classList.remove('change');
+        });
+    }
+
+    /**
+     * Выбор из предложенных результатов  с помощью кнопок up и down
+     *
+     * @param numberPrompt
+     * @param promptItem
+     */
+    function changeKeyArrow(promptItem, numberPrompt) {
+
+        fieldSearch.addEventListener('keydown', e => {
+
+            let promptItemSelect = document.querySelector('.prompt__item.active');
+
+            if (e.key === "Enter") {
+                fieldSearch.value = promptItemSelect.innerText;
+                promptBlock.classList.remove('open');
+                removeChangeSubItem();
+            }
+
+            if (e.code === 'ArrowDown' && numberPrompt + 1 < promptItem.length) {
+                numberPrompt++;
+                promptItem.forEach((item, i) => {
+
+                    if (i === numberPrompt) {
+                        if (promptItemSelect) {
+                            promptItem[numberPrompt - 1].classList.remove('active');
                         }
-                    });
-                } else if (e.code === 'ArrowUp' && numberPrompt - 1 >= 0) {
-                    e.preventDefault();
-                    numberPrompt--;
-                    promptItem.forEach(function (item, i) {
-                        if (i === numberPrompt) {
-                            promptItem[numberPrompt + 1].classList.remove('active');
-                            item.classList.add('active');
-                        }
-                    });
-                }
-            });
 
-            // Удаляем класс выделенной подсказки при навдении мыши
-            promptBlock.addEventListener('mouseover', function () {
-                numberPrompt = -1;
-
-                let promptItemSelect = document.querySelector('.prompt__item.active');
-
-                if (promptItemSelect) promptItemSelect.classList.remove('active');
-            });
-            // Подставляем выбранный результат в поле ввода
-            promptItem.forEach(function (item,) {
-                promptItem[0].classList.add('active');
-                item.addEventListener('click', function () {
-                    fieldSearch.value = this.innerText;
-                    removeChangeSubItem();
-                    let elementId = item.getAttribute('data-id');
-                    document.getElementById(elementId).click();
+                        item.classList.add('active');
+                    }
                 });
-            });
+            } else if (e.code === 'ArrowUp' && numberPrompt - 1 >= 0) {
+                e.preventDefault();
+                numberPrompt--;
+                promptItem.forEach((item, i) => {
+                    if (i === numberPrompt) {
+                        promptItem[numberPrompt + 1].classList.remove('active');
+                        item.classList.add('active');
+                    }
+                });
+            }
         });
     }
 
@@ -229,20 +254,22 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(error => alert(error));
 
-
     let resultBlock = document.querySelector('.results__block');
-
 
     /********** Показываем всплывашку с надписью скопировано при клике по значку копирования или полю*********/
     function textCopy() {
-        if (!copyedBlock.classList.contains('visible')) copyedBlock.classList.add('visible');
-        setTimeout(function () {
-            copyedBlock.classList.remove('visible');
+        let copyBlock = document.querySelector('.copyed__block');
+
+        if (!copyBlock.classList.contains('visible')) copyBlock.classList.add('visible');
+
+        setTimeout(() => {
+            copyBlock.classList.remove('visible');
         }, 1000);
+
     }
 
-    if (!modeEdit()) {
-        resultBlock.onclick = function (e) {
+    if (!edit) {
+        resultBlock.onclick = e => {
             let target = e.target;
             if (target.className === 'results__value' || target.className === 'copy-icon') {
 
@@ -250,12 +277,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             } else if (target.className === 'subtitle') {
                 let targetParent = target.parentNode;
+
                 if (targetParent.classList.contains('hide')) targetParent.classList.remove('hide');
                 else targetParent.classList.add('hide');
             }
         };
     }
 
+    /**
+     * Создание блока с полями (данными о сайте)
+     * @param type {string}
+     * @param id {string | number}
+     */
     function createValueBlock(type, id) {
         let div = document.createElement('div');
         let h3;
@@ -277,8 +310,16 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelector('.block__value[data-name="' + type + '"][data-id="' + id + '"]').appendChild(h3);
     }
 
+    /**
+     * Создание поля
+     * @param elId
+     * @param type
+     * @param fieldName
+     * @param fieldVal
+     * @param typeId
+     */
     function createField(elId, type, fieldName, fieldVal, typeId) {
-        if (!modeEdit()) {
+        if (!edit) {
             let str = '<div class="results__field" data-id="' + elId + '">\n' +
                 '<span class="name" title="' + fieldName + '">' + fieldName + ':' + '</span>\n' +
                 '    <input type="text" class="results__value" data-clipboard-action="copy" id="field-' + elId + '" data-clipboard-target="#field-' + elId + '"\n' +
@@ -305,6 +346,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    /**
+     * Вывод инфы при выборе сайта из подсказок живого поиска
+     */
     function changePrompt() {
         let promptItemSelect = document.querySelector('.prompt__item.active'),
             promptItemValId = promptItemSelect.getAttribute('data-id'),
@@ -313,20 +357,14 @@ document.addEventListener('DOMContentLoaded', function () {
         sendData(bodyText);
     }
 
-    fieldSearch.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-            changePrompt();
-        }
-    });
+    eventHandler("keydown", fieldSearch, e => e.key === 'Enter' ? changePrompt() : false);
 
 
     /********* Выводим результаты с паролями *************/
     function removeValue() {
         let resultBlockValue = document.querySelectorAll('.block__value');
 
-        resultBlockValue.forEach(function (el) {
-            el.remove();
-        });
+        resultBlockValue.forEach(el => el.remove());
     }
 
     /************Добавление блока со значениями (редактирование)************/
@@ -334,11 +372,12 @@ document.addEventListener('DOMContentLoaded', function () {
         let str = `<div class="add-block">Добавить блок</div>`;
 
         if (document.querySelector('.results__block .block__value')) {
-            let rbBlockValue = document.querySelectorAll('.block__value');
-            if (document.querySelector('.results__block > .add-block')) {
-                document.querySelector('.results__block > .add-block').remove();
-            }
-            rbBlockValue.forEach(function (item, index) {
+            let rbBlockValue = document.querySelectorAll('.block__value'),
+                resAddBlock = document.querySelector('.results__block > .add-block');
+
+            if (resAddBlock) resAddBlock.remove();
+
+            rbBlockValue.forEach((item, index) => {
                 if (rbBlockValue.length === (index + 1)) item.insertAdjacentHTML("afterEnd", str);
             });
 
@@ -349,13 +388,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /************Добавление поля со значениями (редактирование)************/
     function addFieldValue(check = false) {
-        document.querySelectorAll('.block__value').forEach(function (el) {
+        document.querySelectorAll('.block__value').forEach(el => {
             if (check) {
-                let child = el.childNodes;
-                [].forEach.call(child, function (elem) {
-                    if (elem.className === 'add-field') elem.remove();
-                });
+
+                [...el.childNodes].forEach(elem => elem.className === 'add-field' ? elem.remove() : false);
             }
+
             let plus = document.createElement('div');
 
             plus.className = 'add-field';
@@ -367,28 +405,41 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /************Вывод результатов************/
 
-    function outputResults(elem) {
+    function outputResults({ONE, TWO}) {
+
+        const {NAME, LINK, ID} = ONE[0];
+
         let valueTitle = document.querySelector('a.title');
-        if (modeEdit()) {
+
+        if (edit) {
             let inputLink = document.querySelector('.input-link');
-            inputLink.value = elem["ONE"][0].LINK;
-            inputLink.setAttribute('data-id', elem["ONE"][0].ID);
+
+            inputLink.value = LINK;
+            inputLink.setAttribute('data-id', ID);
         }
-        valueTitle.innerText = elem["ONE"][0].NAME;
-        valueTitle.setAttribute('href', elem["ONE"][0].LINK);
-        valueTitle.setAttribute('data-id', elem["ONE"][0].ID);
-        for (let k of elem["TWO"]) {
-            let blockVal = document.querySelector('.block__value[data-name="' + k.TYPE_NAME + '"][data-id="' + k.id_type + '"]');
+
+        valueTitle.innerText = NAME;
+        valueTitle.setAttribute('href', LINK);
+        valueTitle.setAttribute('data-id', ID);
+
+        for (let k of TWO) {
+            const {TYPE_NAME, id_type, id_data, FIELD, VALUE} = k;
+
+            let blockVal = document.querySelector('.block__value[data-name="' + TYPE_NAME + '"][data-id="' + id_type + '"]');
+
             if (!blockVal) {
-                createValueBlock(k.TYPE_NAME, k.id_type);
-                createField(k.id_data, k.TYPE_NAME, k.FIELD, k.VALUE, k.id_type);
+                createValueBlock(TYPE_NAME, id_type);
+                createField(id_data, TYPE_NAME, FIELD, VALUE, id_type);
             } else {
-                createField(k.id_data, k.TYPE_NAME, k.FIELD, k.VALUE, k.id_type);
+                createField(id_data, TYPE_NAME, FIELD, VALUE, id_type);
             }
         }
     }
 
-
+    /**
+     * Отправка данных
+     * @param data
+     */
     function sendData(data) {
 
         removeValue();
@@ -401,11 +452,9 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => response.json())
             .then(elem => {
-                if (elem['ONE'].length) {
-                    outputResults(elem);
-                }
+                if (elem['ONE'].length) outputResults(elem);
 
-                if (modeEdit()) {
+                if (edit) {
                     addFieldValue();
                     addBlockValue();
                 }
@@ -413,28 +462,30 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => alert(error));
     }
 
-    blockItems.addEventListener('click', function (e) {
-        let target = e.target;
+    /**
+     * Отправка id при клике по сайту, для отображения инфы выбранного сайта
+     */
+    eventHandler("click", ".subitem-element", (e, elem) => {
 
-        if (target.className === 'subitem-element') {
-            if (document.querySelector('.add-block')) {
-                document.querySelector('.add-block').remove();
-            }
-            let subitemId = target.id,
-                bodytext = "ID=" + subitemId;
+        let addBlock = document.querySelector('.add-block');
 
-            fieldSearch.value = '';
-            if (!target.classList.contains('change')) {
-                document.querySelectorAll('.subitem li:not(.btn-add-site)').forEach(function (el) {
-                    if (el.classList.contains('change')) {
-                        el.classList.remove('change');
-                    }
-                });
-                target.classList.add('change');
-            }
-            sendData(bodytext);
+        if (addBlock) addBlock.remove();
+
+        let subItemId = elem.id,
+            bodyText = "ID=" + subItemId;
+
+        fieldSearch.value = '';
+
+        if (!elem.classList.contains('change')) {
+            document.querySelectorAll('.subitem li:not(.btn-add-site)')
+                .forEach(el => el.classList.contains('change') ? el.classList.remove('change') : false);
+
+            elem.classList.add('change');
         }
-    });
+
+        sendData(bodyText);
+    })
+
     if (subitemChange[0]) subitemChange[0].click();
 
     function updateInput(data) {
@@ -447,23 +498,33 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(elem => {
                 let arData = JSON.parse(data.replace('JSON=', ''));
-                elem = elem[0];
+                const {
+                    id_data,
+                    id_type,
+                    TYPE_NAME,
+                    FIELD,
+                    VALUE,
+                    NAME,
+                    ID,
+                    PID
+                } = elem[0];
+
                 switch (arData.action) {
                     case "add":
-                        createField(elem.id_data, elem.TYPE_NAME, elem.FIELD, elem.VALUE, elem.id_type);
+                        createField(id_data, TYPE_NAME, FIELD, VALUE, id_type);
                         addFieldValue(true);
                         break;
                     case "createTypeRow":
-                        createValueBlock(elem.TYPE_NAME, elem.id_type);
-                        createField(elem.id_data, elem.TYPE_NAME, elem.FIELD, elem.VALUE, elem.id_type);
+                        createValueBlock(TYPE_NAME, id_type);
+                        createField(id_data, TYPE_NAME, FIELD, VALUE, id_type);
                         addFieldValue(true);
                         addBlockValue();
                         break;
                     case "addSite":
-                        addSite(elem.PID, elem.ID, elem.NAME);
+                        addSite(PID, ID, NAME);
                         break;
                     case "addSection":
-                        addSection(elem.ID, elem.NAME);
+                        addSection(ID, NAME);
                         break;
                     default:
                         return false;
@@ -532,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /*****************Сохранение/добавление полей*******************/
-    if (modeEdit()) {
+    if (edit) {
         resultBlock.onclick = function (e) {
             let target = e.target,
                 siteId = target.closest('.results__block')
@@ -564,24 +625,29 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
 
-        resultBlock.onchange = function (e) {
+        resultBlock.onchange = e => {
             let target = e.target;
 
             if (target.tagName === 'INPUT') {
                 textCopy();
+
                 let arData = {};
+
                 arData.action = 'save';
                 arData.id_input = target.getAttribute('data-id');
                 arData.value = target.value;
                 arData.name = target.getAttribute('data-name');
+
                 if (arData.name !== 'LINK') {
                     arData.type = target.closest('.block__value').getAttribute('data-name');
                 } else {
                     document.querySelector('.results__block .title').setAttribute('href', arData.value);
                 }
+
                 if (target.classList.contains('subtitle')) {
                     target.closest('.block__value').setAttribute('data-name', target.value);
                 }
+
                 target.setAttribute('value', target.value);
                 changeInput('JSON=' + JSON.stringify(arData));
             }
@@ -589,24 +655,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let siteBlock = document.querySelector('.side-bar__block');
 
-        siteBlock.addEventListener('change', function (e) {
+        siteBlock.addEventListener('change', e => {
             let target = e.target,
                 targetClass = target.className;
+
             if (targetClass === 'input-site') {
                 let arData = {};
+
                 arData.action = 'saveGroup';
                 arData.value = target.value;
                 arData.id_input = target.getAttribute('data-id');
                 changeInput('JSON=' + JSON.stringify(arData));
+
                 let title = document.querySelector('.results__block .title');
+
                 title.textContent = arData.value;
             }
         });
         /***************Действия над сайтами**********************/
-        siteBlock.addEventListener('click', function (e) {
+        siteBlock.addEventListener('click', e => {
             let target = e.target,
-                targetClass = target.className;
-            let arData = {};
+                targetClass = target.className,
+                arData = {};
+
             switch (targetClass) {
                 case "btn-add-site":
                     arData.action = 'addSite';
@@ -636,6 +707,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    /**
+     * Отправка данных при изменении input-ов
+     * @param data
+     */
     function changeInput(data) {
         fetch(url, {
             cache: "no-cache",
@@ -644,5 +719,4 @@ document.addEventListener('DOMContentLoaded', function () {
             body: data
         }).catch(error => alert(error));
     }
-
 });

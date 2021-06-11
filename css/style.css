@@ -4,7 +4,9 @@
 * Autoprefixer: v9.7.6
 * Browsers: last 4 version
 */
-
+html{
+	overflow-y: scroll;
+}
 html, body {
 	margin: 0;
 	padding: 0;
