@@ -390,7 +390,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function addFieldValue(check = false) {
         document.querySelectorAll('.block__value').forEach(el => {
             if (check) {
-
                 [...el.childNodes].forEach(elem => elem.className === 'add-field' ? elem.remove() : false);
             }
 
@@ -423,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
         valueTitle.setAttribute('data-id', ID);
 
         for (let k of TWO) {
+
             const {TYPE_NAME, id_type, id_data, FIELD, VALUE} = k;
 
             let blockVal = document.querySelector('.block__value[data-name="' + TYPE_NAME + '"][data-id="' + id_type + '"]');
@@ -536,6 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /********************Добавление раздела********************/
     function addSection(id, name) {
         let section = document.querySelector('.items');
+
         if (section) {
 
             let str = '<li> <div class="items__elem"> <input type="text" class="input-site" data-id="' + id + '" value="' + name + '"><span class="arrow">' +
@@ -631,11 +632,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (target.tagName === 'INPUT') {
                 textCopy();
 
-                let arData = {};
+                let arData = {},
+                    targetValue = target.value.trim();
 
+                target.value = targetValue;
                 arData.action = 'save';
                 arData.id_input = target.getAttribute('data-id');
-                arData.value = target.value;
+                arData.value = targetValue;
                 arData.name = target.getAttribute('data-name');
 
                 if (arData.name !== 'LINK') {
@@ -645,10 +648,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (target.classList.contains('subtitle')) {
-                    target.closest('.block__value').setAttribute('data-name', target.value);
+                    target.closest('.block__value').setAttribute('data-name', targetValue);
                 }
 
-                target.setAttribute('value', target.value);
+                target.setAttribute('value', targetValue);
                 changeInput('JSON=' + JSON.stringify(arData));
             }
         };
@@ -663,7 +666,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let arData = {};
 
                 arData.action = 'saveGroup';
-                arData.value = target.value;
+                arData.value = target.value.trim();
+                target.value = arData.value;
                 arData.id_input = target.getAttribute('data-id');
                 changeInput('JSON=' + JSON.stringify(arData));
 
