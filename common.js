@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * сохранив клик по резултатам
      */
     document.addEventListener("click", e => {
-        if (e.target.className !== "search" || e.target.className !== "prompt__item") {
+        if (!["search", "prompt__item"].includes(e.target.className)) {
             promptBlock.classList.remove('open')
         }
     })
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
             copyBlock.classList.remove('visible');
-        }, 1000);
+        }, 1500);
 
     }
 
@@ -582,13 +582,18 @@ document.addEventListener('DOMContentLoaded', () => {
     /********************удаление сайта********************/
     function removeSite(id) {
         document.getElementById(id).remove();
-        if (!document.querySelector('.subitem-element')) document.querySelector('.title').innerHTML = 'Нет данных';
+        if (!document.querySelector('.subitem-element')) {
+            document.querySelector('.title').innerHTML = 'Нет данных';
+        }
+
         if (subitemChange[0]) subitemChange[0].click();
     }
 
     function removeSection(id) {
         document.querySelector('.input-site[data-id="' + id + '"]').closest('li').remove();
-        if (!document.querySelector('.subitem-element')) document.querySelector('.title').innerHTML = 'Нет данных';
+        if (!document.querySelector('.subitem-element')) {
+            document.querySelector('.title').innerHTML = 'Нет данных';
+        }
 
         if (subitemChange[0]) subitemChange[0].click();
     }
@@ -638,7 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 target.value = targetValue;
                 arData.action = 'save';
                 arData.id_input = target.getAttribute('data-id');
-                arData.value = targetValue;
+                arData.value = encodeURIComponent(targetValue);
                 arData.name = target.getAttribute('data-name');
 
                 if (arData.name !== 'LINK') {
@@ -716,6 +721,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param data
      */
     function changeInput(data) {
+        console.log(data)
         fetch(url, {
             cache: "no-cache",
             method: 'POST',

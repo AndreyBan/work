@@ -90,8 +90,6 @@ function view_cat($arr, $pid = 0)
                                     </i>
                                 </span><span class="delete-icon delete-icon-section"></span>
                             </div>';
-				view_cat($arr, $arr[$pid][$i]["ID"]);
-				echo '</li>';
 			} else {
 				echo '<li><div class="items__elem">'
 					. $arr[$pid][$i]["NAME"]
@@ -103,9 +101,9 @@ function view_cat($arr, $pid = 0)
                                     </i>
                                 </span>
                             </div>';
-				view_cat($arr, $arr[$pid][$i]["ID"]);
-				echo '</li>';
 			}
+			view_cat($arr, $arr[$pid][$i]["ID"]);
+			echo '</li>';
 		}
 	} else {
 		echo '<ul class="subitem" data-id="' . $pid . '">';
