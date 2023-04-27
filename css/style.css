@@ -1031,20 +1031,12 @@ header h1 {
 }
 
 @media only screen and (max-width: 1650px) {
-	.results__block {
-		right: 25vw
-	}
-
 	.popup .data {
 		width: 40vw
 	}
 }
 
 @media only screen and (max-width: 1366px) {
-	.results__block {
-		right: 20vw
-	}
-
 	.popup .data {
 		width: 40vw
 	}

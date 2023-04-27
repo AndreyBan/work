@@ -721,7 +721,6 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param data
      */
     function changeInput(data) {
-        console.log(data)
         fetch(url, {
             cache: "no-cache",
             method: 'POST',
